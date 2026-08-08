@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دفتر الإيجارات</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --ink: #0A2726;
+    --ink-2: #071F20;
+    --paper: #F7F5EF;
+    --paper-2: #FFFFFF;
+    --line: #A79E88;
+    --gold: #C9A227;
+    --gold-dark: #8A6E13;
+    --red: #971F1F;
+    --red-bg: #FBEAEA;
+    --amber: #9C5C0C;
+    --amber-bg: #FBF1DF;
+    --green: #235C3B;
+    --green-bg: #EAF3EC;
+    --muted: #423D33;
+    font-size: 16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 10% 5%, rgba(201,162,39,0.08), transparent 35%),
+      radial-gradient(circle at 95% 95%, rgba(35,92,59,0.06), transparent 35%);
+    font-family: "Segoe UI", Tahoma, "Geeza Pro", Arial, sans-serif;
+    color: var(--ink);
+    min-height:100vh;
+    padding: 20px 14px 60px;
+  }
+  .wrap{max-width: 980px; margin: 0 auto;}
+
+  /* Header */
+  header{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; margin-bottom: 22px; flex-wrap:wrap;
+    padding-bottom:16px; border-bottom: 2px solid rgba(201,162,39,0.35);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .seal{
+    width:46px;height:46px;border-radius:50%;
+    border:2px solid var(--gold-dark);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--gold-dark); font-weight:700; font-size:20px;
+    background: radial-gradient(circle, rgba(201,162,39,0.15), transparent 70%);
+    flex-shrink:0;
+  }
+  .brand h1{color:var(--ink); font-size:22px; margin:0; letter-spacing:0.5px;}
+  .brand p{color:var(--muted); margin:2px 0 0; font-size:13.5px; font-weight:500;}
+
+  .btn{
+    border:none; border-radius:8px; padding:10px 16px; font-size:14px;
+    cursor:pointer; font-family:inherit; font-weight:600; transition: transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{transform: scale(0.97);}
+  .btn-gold{background: var(--gold); color:#241B04;}
+  .btn-gold:hover{background: var(--gold-dark);}
+  .btn-outline{background:var(--paper-2); border:1.5px solid var(--ink); color:var(--ink);}
+  .btn-outline:hover{border-color: var(--gold-dark); color:var(--gold-dark);}
+  .btn-ghost{background:transparent; color:var(--muted); padding:6px 10px; font-weight:500;}
+  .btn-danger{background: var(--red-bg); color:var(--red);}
+  .btn-sm{padding:6px 10px; font-size:12.5px; border-radius:6px;}
+
+  /* Summary cards */
+  .summary{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:22px;
+  }
+  @media (max-width:700px){ .summary{grid-template-columns: repeat(2,1fr);} }
+  .card{
+    background: var(--paper-2); border-radius:10px; padding:14px 16px;
+    border: 1px solid var(--line); position:relative; overflow:hidden;
+  }
+  .card::before{
+    content:""; position:absolute; inset-inline-start:0; top:0; bottom:0; width:4px;
+  }
+  .card.c-red::before{background:var(--red);}
+  .card.c-amber::before{background:var(--amber);}
+  .card.c-green::before{background:var(--green);}
+  .card.c-ink::before{background:var(--ink);}
+  .card .num{font-size:26px; font-weight:700; font-variant-numeric:tabular-nums;}
+  .card .lbl{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  /* Filter bar */
+  .filterbar{
+    display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;
+  }
+  select, input[type=text], input[type=search], input[type=date]{
+    font-family:inherit; padding:10px 12px; border-radius:7px; border:1.5px solid var(--line);
+    background:#FBFAF6; color:var(--ink); font-size:14px; font-weight:500;
+  }
+  select:focus, input:focus{
+    outline:none; border-color:var(--gold-dark); box-shadow:0 0 0 3px rgba(201,162,39,0.22);
+  }
+  .filterbar select{min-width:160px;}
+  .filterbar input[type=search]{flex:1; min-width:160px;}
+
+  /* Summary table */
+  .sumtable-wrap{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:10px;
+    overflow-x:auto; margin-bottom:20px;
+  }
+  table.sumtable{width:100%; border-collapse:collapse; font-size:13.5px; min-width:680px;}
+  table.sumtable thead th{
+    text-align:right; padding:10px 12px; background:var(--ink); color:var(--paper);
+    font-weight:700; position:sticky; top:0; white-space:nowrap;
+  }
+  table.sumtable tbody td{
+    padding:9px 12px; border-bottom:1px solid var(--line); white-space:nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  table.sumtable tbody tr:last-child td{border-bottom:none;}
+  table.sumtable tbody tr.row-overdue{background:var(--red-bg);}
+  table.sumtable tbody tr.row-soon{background:var(--amber-bg);}
+  table.sumtable td.sc-status{font-weight:700;}
+  table.sumtable td.sc-status.overdue{color:var(--red);}
+  table.sumtable td.sc-status.soon{color:var(--amber);}
+  table.sumtable td.sc-status.ok{color:var(--green);}
+
+  /* Building groups */
+  .building-group{margin-bottom: 26px;}
+  .building-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 10px 4px; border-bottom: 2px solid rgba(201,162,39,0.5); margin-bottom:10px;
+  }
+  .building-head h2{color:var(--ink); font-size:17px; margin:0; display:flex; align-items:center; gap:8px;}
+  .building-head .count{color:var(--muted); font-size:13px; font-weight:400;}
+  .building-actions{display:flex; gap:6px;}
+
+  /* Unit ledger row */
+  .unit-card{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; margin-bottom:10px;
+    display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center;
+  }
+  .unit-main{display:flex; flex-direction:column; gap:4px;}
+  .unit-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .unit-name{font-weight:700; font-size:15.5px;}
+  .unit-tenant{color:var(--muted); font-size:13.5px;}
+  .badge{
+    display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:20px;
+    font-size:12px; font-weight:700;
+  }
+  .badge-dot{width:7px;height:7px;border-radius:50%;}
+  .badge-red{background:var(--red-bg); color:var(--red);}
+  .badge-red .badge-dot{background:var(--red); box-shadow:0 0 0 3px rgba(179,58,58,0.18);}
+  .badge-amber{background:var(--amber-bg); color:var(--amber);}
+  .badge-amber .badge-dot{background:var(--amber); box-shadow:0 0 0 3px rgba(199,122,31,0.18);}
+  .badge-green{background:var(--green-bg); color:var(--green);}
+  .badge-green .badge-dot{background:var(--green);}
+  .badge-gray{background:#EEEDE7; color:var(--muted);}
+
+  .unit-meta{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--muted);
+    font-variant-numeric: tabular-nums;
+    border-top: 1px dashed var(--line); padding-top:8px; margin-top:6px;
+  }
+  .unit-meta b{color:var(--ink); font-weight:600;}
+  .unit-actions{display:flex; flex-direction:column; gap:6px; align-items:stretch; min-width:120px;}
+
+  .empty{
+    text-align:center; color:var(--muted); padding: 50px 16px; font-size:14.5px;
+    background:var(--paper-2); border-radius:10px; border:1px solid var(--line);
+  }
+  .empty b{color:var(--gold-dark); display:block; font-size:17px; margin-bottom:6px;}
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(11,44,45,0.55); display:none;
+    align-items:center; justify-content:center; padding:16px; z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--paper-2); border-radius:12px; padding:22px; width:100%; max-width:480px;
+    max-height:88vh; overflow-y:auto; border-top:4px solid var(--gold);
+  }
+  .modal h3{margin:0 0 16px; font-size:17px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:13px; color:var(--muted); margin-bottom:5px; font-weight:600;}
+  .field input, .field select{width:100%;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .modal-actions{display:flex; gap:8px; margin-top:18px; justify-content:flex-end;}
+
+  .toast{
+    position:fixed; bottom:20px; right:50%; transform:translateX(50%);
+    background: var(--ink); color:var(--paper); padding:10px 20px; border-radius:8px;
+    font-size:13.5px; box-shadow:0 6px 20px rgba(0,0,0,0.3); z-index:60;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, bottom .25s ease;
+  }
+  .toast.show{opacity:1; bottom:30px;}
+
+  ::placeholder{color:#8C8674;}
+
+  .banner{
+    display:none; background:#FBF1DF; border:1.5px solid var(--amber); color:#5C3B08;
+    border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13.5px; line-height:1.8;
+  }
+  .banner.show{display:block;}
+  .banner code{background:#00000010; padding:1px 6px; border-radius:4px; font-size:12.5px;}
+  .sync-status{
+    display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin-bottom:14px;
+  }
+  .sync-dot{width:8px;height:8px;border-radius:50%; background:var(--green);}
+  .sync-dot.off{background:#9C9C9C;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <div class="seal">₪</div>
+      <div>
+        <h1>دفتر الإيجارات</h1>
+        <p>متابعة تحصيل الإيجارات وتواريخ العقود لكل المباني</p>
+      </div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+      <button class="btn btn-outline" id="btnAddBuilding">+ إضافة مبنى</button>
+      <button class="btn btn-gold" id="btnAddUnit">+ إضافة وحدة</button>
+    </div>
+  </header>
+
+  <div class="banner" id="setupBanner">
+    ⚠️ لم يتم ربط قاعدة البيانات السحابية بعد — البيانات الآن تُحفظ في هذا المتصفح فقط ولن تظهر من جهاز آخر.
+    افتح ملف الكود وابحث عن <code>firebaseConfig</code> في الأسفل، واستبدله ببيانات مشروعك في Firebase، ثم ارفع الملف على GitHub Pages.
+  </div>
+  <div class="sync-status" id="syncStatus">
+    <span class="sync-dot off" id="syncDot"></span>
+    <span id="syncText">وضع الحفظ المحلي (بدون مزامنة)</span>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="filterbar">
+    <select id="filterBuilding"><option value="">كل المباني</option></select>
+    <input type="search" id="searchBox" placeholder="بحث باسم المستأجر أو رقم الوحدة...">
+    <select id="filterStatus">
+      <option value="">كل الحالات</option>
+      <option value="overdue">متأخر السداد</option>
+      <option value="soon">مستحق قريباً</option>
+      <option value="ok">غير مستحق</option>
+    </select>
+    <button class="btn btn-outline btn-sm" id="btnToggleView">📋 ملخص شامل</button>
+  </div>
+
+  <div id="content"></div>
+  <div id="summaryTableWrap" style="display:none;"></div>
+</div>
+
+<!-- Building Modal -->
+<div class="overlay" id="overlayBuilding">
+  <div class="modal">
+    <h3 id="buildingModalTitle">إضافة مبنى جديد</h3>
+    <input type="hidden" id="buildingId">
+    <div class="field">
+      <label>اسم المبنى</label>
+      <input type="text" id="buildingName" placeholder="مثال: عمارة النخيل">
+    </div>
+    <div class="field">
+      <label>الموقع (اختياري)</label>
+      <input type="text" id="buildingLocation" placeholder="مثال: حي الروضة">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('overlayBuilding')">إلغاء</button>
+      <button class="btn btn-gold" id="saveBuildingBtn">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Unit Modal -->
+<div class="overlay" id="overlayUnit">
+  <div class="modal">
+    <h3 id="unitModalTitle">إضافة وحدة / عقد إيجار</h3>
+    <input type="hidden" id="unitId">
+    <div class="field">
+      <label>المبنى</label>
+      <select id="unitBuilding"></select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>رقم الوحدة</label>
+        <input type="text" id="unitNumber" placeholder="مثال: شقة 3">
+      </div>
+      <div class="field">
+        <label>اسم المستأجر</label>
+        <input type="text" id="unitTenant" placeholder="اسم المستأجر">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>قيمة الإيجار</label>
+        <input type="text" inputmode="decimal" id="unitRent" placeholder="0">
+      </div>
+      <div class="field">
+        <label>دورية السداد</label>
+        <select id="unitFreq">
+          <option value="1">شهري</option>
+          <option value="3">ربع سنوي</option>
+          <option value="6">نصف سنوي</option>
+          <option value="12">سنوي</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>تاريخ بداية العقد</label>
+        <input type="date" id="unitStart">
+      </div>
+      <div class="field">
+        <label>تاريخ نهاية العقد</label>
+        <input type="date" id="unitEnd">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>قيمة الماء</label>
+        <input type="text" inputmode="decimal" id="unitWater" placeholder="0">
+      </div>
+      <div class="field">
+        <label>التأمين</label>
+        <input type="text" inputmode="decimal" id="unitInsurance" placeholder="0">
+      </div>
+    </div>
+    <div class="field">
+      <label>تاريخ آخر تحصيل (اختياري)</label>
+      <input type="date" id="unitLastPaid">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('overlayUnit')">إلغاء</button>
+      <button class="btn btn-gold" id="saveUnitBtn">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let state = { buildings: [], units: [] };
+const STORAGE_KEY = 'rent-ledger-data'; // مفتاح الحفظ المحلي الاحتياطي
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ============================================================
+   إعداد Firebase — استبدل القيم أدناه بإعدادات مشروعك في Firebase
+   (Firebase Console → إعدادات المشروع → عام → تطبيقاتك → Web app)
+   طالما تركت القيم كما هي، سيعمل البرنامج بالحفظ المحلي فقط.
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCnyVLHZKbBvSYHpoTpTlshlWCgqfENwis",
+  authDomain: "rent-ledger-2928c.firebaseapp.com",
+  projectId: "rent-ledger-2928c",
+  storageBucket: "rent-ledger-2928c.firebasestorage.app",
+  messagingSenderId: "891180179928",
+  appId: "1:891180179928:web:fd10e23d227bec92ff92ad"
+};
+
+let db = null;
+let docRef = null;
+let firebaseReady = false;
+let suppressNextSave = false;
+
+function isConfigured(){
+  return firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
+}
+
+function setSyncUI(connected){
+  const dot = document.getElementById('syncDot');
+  const text = document.getElementById('syncText');
+  if(connected){
+    dot.classList.remove('off');
+    text.textContent = 'متصل بقاعدة البيانات السحابية — البيانات تُشارك بين كل الأجهزة';
+  }else{
+    dot.classList.add('off');
+    text.textContent = 'وضع الحفظ المحلي (بدون مزامنة) — البيانات محفوظة في هذا المتصفح فقط';
+  }
+}
+
+function attachFirestoreListener(){
+  docRef.onSnapshot((snap)=>{
+    if(suppressNextSave){ suppressNextSave = false; return; }
+    if(snap.exists && snap.data().state){
+      try{ state = JSON.parse(snap.data().state); }catch(e){}
+    }
+    render();
+  }, (err)=>{
+    console.error(err);
+    showToast('تعذر الاتصال بقاعدة البيانات، تحقق من إعدادات Firebase وقواعد الأمان');
+    setSyncUI(false);
+  });
+}
+
+async function loadData(){
+  if(isConfigured()){
+    try{
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      docRef = db.collection('rentLedger').doc('data');
+      document.getElementById('setupBanner').classList.remove('show');
+      firebaseReady = true;
+      setSyncUI(true);
+      attachFirestoreListener();
+      return; // render() يُستدعى من onSnapshot
+    }catch(e){
+      console.error(e);
+      showToast('تعذر تهيئة Firebase، تحقق من الإعدادات');
+    }
+  }
+
+  // وضع احتياطي: الحفظ محلياً في المتصفح فقط
+  document.getElementById('setupBanner').classList.add('show');
+  setSyncUI(false);
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) state = JSON.parse(raw);
+  }catch(e){}
+  render();
+}
+
+async function saveData(){
+  if(firebaseReady && docRef){
+    try{
+      suppressNextSave = true;
+      await docRef.set({ state: JSON.stringify(state), updatedAt: Date.now() });
+    }catch(e){
+      console.error(e);
+      showToast('تعذر حفظ البيانات في قاعدة البيانات السحابية');
+    }
+    return;
+  }
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    showToast('تعذر حفظ البيانات في هذا المتصفح');
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+/* ---------- Date helpers ---------- */
+function addMonths(dateStr, months){
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+function todayDate(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  return d;
+}
+function daysBetween(a, b){
+  return Math.round((b - a) / 86400000);
+}
+function fmtDate(dateStr){
+  if(!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('ar-EG', {year:'numeric', month:'short', day:'numeric'});
+}
+function fmtNum(n){
+  return Number(n||0).toLocaleString('ar-EG');
+}
+
+function getDueInfo(unit){
+  const base = unit.lastPaymentDate || unit.contractStart;
+  if(!base) return {status:'ok', nextDue:null, days:null};
+  const next = addMonths(base, Number(unit.frequency));
+  const today = todayDate();
+  const days = daysBetween(today, next);
+  let status = 'ok';
+  if(days < 0) status = 'overdue';
+  else if(days <= 7) status = 'soon';
+  return {status, nextDue: next, days};
+}
+
+function getContractStatus(unit){
+  if(!unit.contractEnd) return null;
+  const end = new Date(unit.contractEnd + 'T00:00:00');
+  const today = todayDate();
+  const days = daysBetween(today, end);
+  if(days < 0) return {label:'العقد منتهي', cls:'badge-gray'};
+  if(days <= 30) return {label:'العقد ينتهي قريباً (' + days + ' يوم)', cls:'badge-amber'};
+  return null;
+}
+
+/* ---------- Rendering ---------- */
+function populateBuildingSelects(){
+  const filterSel = document.getElementById('filterBuilding');
+  const unitSel = document.getElementById('unitBuilding');
+  const prevFilter = filterSel.value;
+  filterSel.innerHTML = '<option value="">كل المباني</option>' +
+    state.buildings.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
+  filterSel.value = prevFilter;
+  unitSel.innerHTML = state.buildings.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
+}
+
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let viewMode = 'cards'; // 'cards' | 'table'
+
+function render(){
+  populateBuildingSelects();
+  renderSummary();
+  if(viewMode === 'table'){
+    renderSummaryTable();
+  }else{
+    renderContent();
+  }
+}
+
+function renderSummary(){
+  let overdue=0, soon=0, ok=0, monthlyTotal=0;
+  state.units.forEach(u=>{
+    const info = getDueInfo(u);
+    if(info.status==='overdue') overdue++;
+    else if(info.status==='soon') soon++;
+    else ok++;
+    // normalize to monthly-equivalent expected income
+    monthlyTotal += Number(u.rentAmount||0) / Number(u.frequency||1);
+  });
+  const el = document.getElementById('summary');
+  el.innerHTML = `
+    <div class="card c-red"><div class="num">${overdue}</div><div class="lbl">وحدات متأخرة السداد</div></div>
+    <div class="card c-amber"><div class="num">${soon}</div><div class="lbl">مستحقة خلال 7 أيام</div></div>
+    <div class="card c-green"><div class="num">${ok}</div><div class="lbl">وحدات مسددة</div></div>
+    <div class="card c-ink"><div class="num">${fmtNum(Math.round(monthlyTotal))}</div><div class="lbl">إجمالي الدخل الشهري المتوقع</div></div>
+  `;
+}
+
+function renderContent(){
+  const content = document.getElementById('content');
+  const fBuilding = document.getElementById('filterBuilding').value;
+  const fStatus = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchBox').value.trim().toLowerCase();
+
+  if(state.buildings.length === 0){
+    content.innerHTML = `<div class="empty"><b>لا توجد مبانٍ بعد</b>ابدأ بإضافة مبنى ثم أضف الوحدات وعقود الإيجار الخاصة به.</div>`;
+    return;
+  }
+
+  let buildingsToShow = state.buildings;
+  if(fBuilding) buildingsToShow = buildingsToShow.filter(b=>b.id===fBuilding);
+
+  let html = '';
+  let totalShown = 0;
+
+  buildingsToShow.forEach(b=>{
+    let units = state.units.filter(u=>u.buildingId===b.id);
+    units = units.filter(u=>{
+      const info = getDueInfo(u);
+      if(fStatus && info.status !== fStatus) return false;
+      if(search){
+        const hay = (u.tenantName+' '+u.unitNumber).toLowerCase();
+        if(!hay.includes(search)) return false;
+      }
+      return true;
+    });
+    if(fBuilding === '' && units.length===0 && (search || fStatus)) return;
+    totalShown += units.length;
+
+    html += `<div class="building-group">
+      <div class="building-head">
+        <h2>${escapeHtml(b.name)} <span class="count">(${units.length} وحدة)</span></h2>
+        <div class="building-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editBuilding('${b.id}')">تعديل</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteBuilding('${b.id}')">حذف المبنى</button>
+        </div>
+      </div>`;
+
+    if(units.length===0){
+      html += `<div class="empty" style="padding:24px;">لا توجد وحدات مطابقة في هذا المبنى</div>`;
+    }else{
+      units.forEach(u=>{
+        const info = getDueInfo(u);
+        const contractInfo = getContractStatus(u);
+        let badgeCls='badge-green', badgeText='غير مستحق';
+        if(info.status==='overdue'){ badgeCls='badge-red'; badgeText='متأخر ' + Math.abs(info.days) + ' يوم'; }
+        else if(info.status==='soon'){ badgeCls='badge-amber'; badgeText = info.days===0 ? 'مستحق اليوم' : 'مستحق خلال ' + info.days + ' يوم'; }
+
+        html += `<div class="unit-card">
+          <div class="unit-main">
+            <div class="unit-top">
+              <span class="unit-name">${escapeHtml(u.unitNumber||'وحدة')}</span>
+              <span class="badge ${badgeCls}"><span class="badge-dot"></span>${badgeText}</span>
+              ${contractInfo ? `<span class="badge ${contractInfo.cls}">${contractInfo.label}</span>` : ''}
+            </div>
+            <div class="unit-tenant">${escapeHtml(u.tenantName||'بدون اسم مستأجر')}</div>
+            <div class="unit-meta">
+              <span>الإيجار: <b>${fmtNum(u.rentAmount)}</b></span>
+              <span>الدورية: <b>${freqLabel(u.frequency)}</b></span>
+              ${u.waterAmount ? `<span>الماء: <b>${fmtNum(u.waterAmount)}</b></span>` : ''}
+              ${u.insuranceAmount ? `<span>التأمين: <b>${fmtNum(u.insuranceAmount)}</b></span>` : ''}
+              <span>بداية العقد: <b>${fmtDate(u.contractStart)}</b></span>
+              <span>نهاية العقد: <b>${fmtDate(u.contractEnd)}</b></span>
+              <span>الاستحقاق القادم: <b>${info.nextDue ? fmtDate(info.nextDue.toISOString().slice(0,10)) : '—'}</b></span>
+            </div>
+          </div>
+          <div class="unit-actions">
+            <button class="btn btn-gold btn-sm" onclick="markPaid('${u.id}')">تسجيل التحصيل</button>
+            <button class="btn btn-ghost btn-sm" onclick="editUnit('${u.id}')">تعديل</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteUnit('${u.id}')">حذف</button>
+          </div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+  });
+
+  if(html.trim()===''){
+    html = `<div class="empty"><b>لا نتائج</b>جرّب تعديل عوامل التصفية أو البحث.</div>`;
+  }
+  content.innerHTML = html;
+}
+
+function freqLabel(f){
+  return {1:'شهري',3:'ربع سنوي',6:'نصف سنوي',12:'سنوي'}[f] || f;
+}
+
+/* ---------- Building CRUD ---------- */
+document.getElementById('btnAddBuilding').onclick = ()=>{
+  document.getElementById('buildingModalTitle').textContent = 'إضافة مبنى جديد';
+  document.getElementById('buildingId').value = '';
+  document.getElementById('buildingName').value = '';
+  document.getElementById('buildingLocation').value = '';
+  openModal('overlayBuilding');
+};
+
+function editBuilding(id){
+  const b = state.buildings.find(x=>x.id===id);
+  if(!b) return;
+  document.getElementById('buildingModalTitle').textContent = 'تعديل المبنى';
+  document.getElementById('buildingId').value = b.id;
+  document.getElementById('buildingName').value = b.name;
+  document.getElementById('buildingLocation').value = b.location || '';
+  openModal('overlayBuilding');
+}
+
+document.getElementById('saveBuildingBtn').onclick = async ()=>{
+  const name = document.getElementById('buildingName').value.trim();
+  if(!name){ showToast('الرجاء إدخال اسم المبنى'); return; }
+  const id = document.getElementById('buildingId').value;
+  const location = document.getElementById('buildingLocation').value.trim();
+  if(id){
+    const b = state.buildings.find(x=>x.id===id);
+    b.name = name; b.location = location;
+  }else{
+    state.buildings.push({id: uid(), name, location});
+  }
+  await saveData();
+  closeModal('overlayBuilding');
+  render();
+  showToast('تم الحفظ');
+};
+
+async function deleteBuilding(id){
+  if(!confirm('سيتم حذف المبنى وجميع وحداته. هل أنت متأكد؟')) return;
+  state.buildings = state.buildings.filter(b=>b.id!==id);
+  state.units = state.units.filter(u=>u.buildingId!==id);
+  await saveData();
+  render();
+  showToast('تم الحذف');
+}
+
+/* ---------- Unit CRUD ---------- */
+document.getElementById('btnAddUnit').onclick = ()=>{
+  if(state.buildings.length===0){ showToast('أضف مبنى أولاً'); return; }
+  document.getElementById('unitModalTitle').textContent = 'إضافة وحدة / عقد إيجار';
+  document.getElementById('unitId').value='';
+  document.getElementById('unitNumber').value='';
+  document.getElementById('unitTenant').value='';
+  document.getElementById('unitRent').value='';
+  document.getElementById('unitFreq').value='1';
+  document.getElementById('unitStart').value='';
+  document.getElementById('unitEnd').value='';
+  document.getElementById('unitWater').value='';
+  document.getElementById('unitInsurance').value='';
+  document.getElementById('unitLastPaid').value='';
+  populateBuildingSelects();
+  openModal('overlayUnit');
+};
+
+function editUnit(id){
+  const u = state.units.find(x=>x.id===id);
+  if(!u) return;
+  document.getElementById('unitModalTitle').textContent = 'تعديل الوحدة';
+  document.getElementById('unitId').value = u.id;
+  populateBuildingSelects();
+  document.getElementById('unitBuilding').value = u.buildingId;
+  document.getElementById('unitNumber').value = u.unitNumber;
+  document.getElementById('unitTenant').value = u.tenantName;
+  document.getElementById('unitRent').value = u.rentAmount;
+  document.getElementById('unitFreq').value = u.frequency;
+  document.getElementById('unitStart').value = u.contractStart || '';
+  document.getElementById('unitEnd').value = u.contractEnd || '';
+  document.getElementById('unitWater').value = u.waterAmount || '';
+  document.getElementById('unitInsurance').value = u.insuranceAmount || '';
+  document.getElementById('unitLastPaid').value = u.lastPaymentDate || '';
+  openModal('overlayUnit');
+}
+
+document.getElementById('saveUnitBtn').onclick = async ()=>{
+  const buildingId = document.getElementById('unitBuilding').value;
+  const unitNumber = document.getElementById('unitNumber').value.trim();
+  const tenantName = document.getElementById('unitTenant').value.trim();
+  const rentAmount = parseFloat(document.getElementById('unitRent').value) || 0;
+  const frequency = document.getElementById('unitFreq').value;
+  const contractStart = document.getElementById('unitStart').value;
+  const contractEnd = document.getElementById('unitEnd').value;
+  const waterAmount = parseFloat(document.getElementById('unitWater').value) || 0;
+  const insuranceAmount = parseFloat(document.getElementById('unitInsurance').value) || 0;
+  const lastPaymentDate = document.getElementById('unitLastPaid').value;
+
+  if(!buildingId || !unitNumber || !contractStart){
+    showToast('الرجاء تعبئة المبنى ورقم الوحدة وتاريخ بداية العقد');
+    return;
+  }
+  const id = document.getElementById('unitId').value;
+  if(id){
+    const u = state.units.find(x=>x.id===id);
+    Object.assign(u, {buildingId, unitNumber, tenantName, rentAmount, frequency, contractStart, contractEnd, waterAmount, insuranceAmount, lastPaymentDate});
+  }else{
+    state.units.push({id: uid(), buildingId, unitNumber, tenantName, rentAmount, frequency, contractStart, contractEnd, waterAmount, insuranceAmount, lastPaymentDate, payments:[]});
+  }
+  await saveData();
+  closeModal('overlayUnit');
+  render();
+  showToast('تم الحفظ');
+};
+
+async function deleteUnit(id){
+  if(!confirm('هل تريد حذف هذه الوحدة؟')) return;
+  state.units = state.units.filter(u=>u.id!==id);
+  await saveData();
+  render();
+  showToast('تم الحذف');
+}
+
+async function markPaid(id){
+  const u = state.units.find(x=>x.id===id);
+  if(!u) return;
+  const today = new Date().toISOString().slice(0,10);
+  u.lastPaymentDate = today;
+  u.payments = u.payments || [];
+  u.payments.push({date: today, amount: u.rentAmount});
+  await saveData();
+  render();
+  showToast('تم تسجيل التحصيل');
+}
+
+/* ---------- Filters ---------- */
+function renderMain(){
+  if(viewMode === 'table') renderSummaryTable();
+  else renderContent();
+}
+
+document.getElementById('btnToggleView').onclick = ()=>{
+  viewMode = (viewMode === 'table') ? 'cards' : 'table';
+  document.getElementById('content').style.display = (viewMode==='table') ? 'none' : '';
+  document.getElementById('summaryTableWrap').style.display = (viewMode==='table') ? '' : 'none';
+  document.getElementById('btnToggleView').textContent = (viewMode==='table') ? '🗂️ عرض البطاقات' : '📋 ملخص شامل';
+  renderMain();
+};
+
+function renderSummaryTable(){
+  const wrap = document.getElementById('summaryTableWrap');
+  const fBuilding = document.getElementById('filterBuilding').value;
+  const fStatus = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchBox').value.trim().toLowerCase();
+
+  if(state.units.length === 0){
+    wrap.innerHTML = `<div class="empty"><b>لا توجد وحدات بعد</b>أضف وحدات لتظهر هنا في الملخص الشامل.</div>`;
+    return;
+  }
+
+  const buildingName = (id)=> {
+    const b = state.buildings.find(x=>x.id===id);
+    return b ? b.name : '—';
+  };
+
+  let rows = state.units.map(u=>{
+    const info = getDueInfo(u);
+    const contractInfo = getContractStatus(u);
+    return {u, info, contractInfo};
+  });
+
+  rows = rows.filter(({u, info})=>{
+    if(fBuilding && u.buildingId !== fBuilding) return false;
+    if(fStatus && info.status !== fStatus) return false;
+    if(search){
+      const hay = (u.tenantName+' '+u.unitNumber+' '+buildingName(u.buildingId)).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // ترتيب: المتأخر أولاً، ثم المستحق قريباً، ثم الباقي — وداخل كل مجموعة الأقرب استحقاقاً أولاً
+  const statusOrder = {overdue:0, soon:1, ok:2};
+  rows.sort((a,b)=>{
+    const so = statusOrder[a.info.status] - statusOrder[b.info.status];
+    if(so !== 0) return so;
+    const da = a.info.nextDue ? a.info.nextDue.getTime() : Infinity;
+    const db = b.info.nextDue ? b.info.nextDue.getTime() : Infinity;
+    return da - db;
+  });
+
+  if(rows.length === 0){
+    wrap.innerHTML = `<div class="empty"><b>لا نتائج</b>جرّب تعديل عوامل التصفية أو البحث.</div>`;
+    return;
+  }
+
+  let html = `<div class="sumtable-wrap"><table class="sumtable">
+    <thead><tr>
+      <th>المبنى</th><th>الوحدة</th><th>المستأجر</th><th>الإيجار</th>
+      <th>الحالة</th><th>الاستحقاق القادم</th><th>نهاية العقد</th>
+    </tr></thead><tbody>`;
+
+  rows.forEach(({u, info, contractInfo})=>{
+    let rowCls='', statusCls='ok', statusText='غير مستحق';
+    if(info.status==='overdue'){ rowCls='row-overdue'; statusCls='overdue'; statusText='متأخر ' + Math.abs(info.days) + ' يوم'; }
+    else if(info.status==='soon'){ rowCls='row-soon'; statusCls='soon'; statusText = info.days===0 ? 'مستحق اليوم' : 'خلال ' + info.days + ' يوم'; }
+
+    html += `<tr class="${rowCls}">
+      <td>${escapeHtml(buildingName(u.buildingId))}</td>
+      <td><b>${escapeHtml(u.unitNumber||'—')}</b></td>
+      <td>${escapeHtml(u.tenantName||'—')}</td>
+      <td>${fmtNum(u.rentAmount)}</td>
+      <td class="sc-status ${statusCls}">${statusText}</td>
+      <td>${info.nextDue ? fmtDate(info.nextDue.toISOString().slice(0,10)) : '—'}</td>
+      <td>${fmtDate(u.contractEnd)}${contractInfo ? ' ⚠️' : ''}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  wrap.innerHTML = html;
+}
+
+document.getElementById('filterBuilding').addEventListener('change', renderMain);
+document.getElementById('filterStatus').addEventListener('change', renderMain);
+document.getElementById('searchBox').addEventListener('input', renderMain);
+
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', (e)=>{ if(e.target===ov) ov.classList.remove('open'); });
+});
+
+loadData();
+</script>
+</body>
+</html>
