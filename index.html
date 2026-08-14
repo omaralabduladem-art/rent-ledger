@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="شجرة العائلة">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0B2B26">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%230B2B26'/%3E%3Ctext x='50' y='68' font-size='55' text-anchor='middle' fill='%23E9CD8C'%3E%F0%9F%8C%B3%3C/text%3E%3C/svg%3E">
+<title>شجرة العائلة</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700&display=swap');
+*{box-sizing:border-box;}
+:root{
+  --bg:#0B2B26; --bg-2:#0F332C; --panel:#133830; --panel-2:#175243;
+  --gold:#C9A15A; --gold-light:#E9CD8C; --cream:#F2EBDA; --cream-dim:#C9C0AC;
+  --male:#4FA3E3; --female:#E87FA8; --danger:#C4685F;
+}
+body{margin:0;font-family:'Tajawal',sans-serif;background:radial-gradient(ellipse at 50% -10%, var(--bg-2), var(--bg) 60%);color:var(--cream);overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
+.ft-login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.ft-login-card{background:var(--panel);border:1px solid rgba(201,161,90,0.35);border-radius:18px;padding:32px 26px;width:100%;max-width:360px;text-align:center;}
+.ft-login-card h2{font-family:'Amiri',serif;color:var(--gold-light);font-size:24px;margin:0 0 6px;}
+.ft-login-card p{color:var(--cream-dim);font-size:13px;margin:0 0 20px;line-height:1.6;}
+.ft-field{margin-bottom:14px;text-align:right;}
+.ft-field label{display:block;font-size:12.5px;color:var(--cream-dim);margin-bottom:5px;}
+.ft-field input,.ft-field select,.ft-field textarea{width:100%;background:var(--bg-2);border:1px solid rgba(201,161,90,0.3);border-radius:8px;padding:9px 11px;color:var(--cream);font-family:'Tajawal',sans-serif;font-size:14px;box-sizing:border-box;direction:rtl;unicode-bidi:plaintext;}
+.ft-field textarea{resize:vertical;min-height:60px;}
+.ft-row2{display:flex;gap:10px;}
+.ft-row2>div{flex:1;}
+.ft-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--gold);color:#0B2B26;border:none;border-radius:999px;padding:9px 18px;font-family:'Tajawal',sans-serif;font-weight:700;font-size:14px;cursor:pointer;}
+.ft-btn:hover{background:var(--gold-light);}
+.ft-btn.secondary{background:var(--panel-2);color:var(--cream);border:1px solid rgba(201,161,90,0.4);}
+.ft-btn.danger{background:var(--danger);color:#2a0f0d;}
+.ft-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.ft-recovery-code{font-family:monospace;font-size:16px;letter-spacing:1px;color:var(--gold-light);background:var(--bg-2);border:1px dashed rgba(201,161,90,0.5);border-radius:10px;padding:14px;word-break:break-all;direction:ltr;text-align:center;}
+.ft-err{color:var(--danger);font-size:13px;margin-bottom:10px;}
+header{padding:16px 16px 12px;text-align:center;border-bottom:1px solid rgba(201,161,90,0.25);background:linear-gradient(180deg, rgba(11,43,38,0.9), rgba(11,43,38,0.4));z-index:10;max-width:900px;margin:0 auto;flex-shrink:0;width:100%;}
+h1{font-family:'Amiri',serif;font-size:34px;font-weight:700;color:var(--gold-light);margin:0;letter-spacing:0.3px;text-shadow:0 2px 8px rgba(0,0,0,0.4);}
+.sub{font-size:12px;color:var(--cream-dim);margin-top:4px;}
+.userbar{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--cream-dim);}
+.userbar button{background:none;border:none;color:var(--cream-dim);cursor:pointer;font-size:12px;text-decoration:underline;text-underline-offset:3px;}
+.userbar button:hover{color:var(--gold-light);}
+.role-badge{background:rgba(201,161,90,0.18);border:1px solid rgba(201,161,90,0.4);border-radius:999px;padding:2px 10px;font-size:11px;color:var(--gold-light);}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-top:10px;}
+.search{display:flex;align-items:center;gap:6px;background:var(--panel);border:1px solid rgba(201,161,90,0.3);border-radius:999px;padding:7px 14px;min-width:180px;}
+.search input{background:transparent;border:none;outline:none;color:var(--cream);font-family:'Tajawal',sans-serif;font-size:13px;width:100%;direction:rtl;unicode-bidi:plaintext;}
+.legend{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+.legend button{background:rgba(23,82,67,0.5);border:1px solid rgba(201,161,90,0.25);color:var(--cream-dim);border-radius:8px;padding:4px 9px;font-size:11px;font-family:'Tajawal',sans-serif;cursor:pointer;}
+.legend button:hover{border-color:var(--gold);color:var(--gold-light);}
+#canvasWrap{position:relative;flex:1;min-height:0;overflow:auto;touch-action:none;}
+#canvas{position:relative;transform-origin:top right;}
+.node{position:absolute;width:90px;text-align:center;cursor:pointer;background:linear-gradient(160deg, rgba(31,100,150,0.4), rgba(23,82,67,0.6));border:2px solid var(--male);border-radius:12px;padding:7px 6px;box-shadow:0 3px 10px rgba(0,0,0,0.3);box-sizing:border-box;}
+.node.female{border-color:var(--female);background:linear-gradient(160deg, rgba(160,45,90,0.4), rgba(23,82,67,0.6));}
+.node.deceased{border-color:#A3A3A3;background:rgba(80,80,80,0.65);}
+.node.deceased .name{color:#E2E2E2;}
+.node.deceased .years{color:#B5B5B5;}
+.node.match{border-color:var(--gold-light);box-shadow:0 0 14px 2px var(--gold-light);}
+.node .name{font-size:13.5px;font-weight:700;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.node .years{font-size:11px;color:var(--cream-dim);margin-top:2px;}
+.genlabel{position:absolute;font-size:12.5px;font-weight:600;color:var(--gold-light);opacity:.9;right:10px;text-shadow:0 1px 3px rgba(0,0,0,0.6);}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--cream-dim);}
+.zoom{position:fixed;left:16px;bottom:16px;display:flex;flex-direction:column;gap:6px;z-index:20;}
+.zoom button{width:38px;height:38px;border-radius:50%;background:var(--panel-2);border:1px solid rgba(201,161,90,0.4);color:var(--gold-light);cursor:pointer;font-size:18px;}
+.overlay{position:fixed;inset:0;background:rgba(5,15,13,0.72);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px;}
+.modal{background:var(--panel);border:1px solid rgba(201,161,90,0.35);border-radius:18px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;padding:22px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.modal-close{position:absolute;top:14px;left:14px;background:none;border:none;color:var(--cream-dim);cursor:pointer;font-size:20px;}
+.detail-avatar{width:110px;height:110px;border-radius:50%;margin:0 auto 12px;object-fit:cover;border:3px solid var(--gold);background:#175243;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:40px;}
+.detail-avatar img{width:100%;height:100%;object-fit:cover;}
+.detail-name{font-family:'Amiri',serif;font-size:22px;text-align:center;color:var(--gold-light);font-weight:700;}
+.detail-meta{text-align:center;color:var(--cream-dim);font-size:13px;margin-top:4px;}
+.detail-bio{margin-top:14px;font-size:14px;line-height:1.7;color:var(--cream);white-space:pre-wrap;}
+.detail-rel{margin-top:14px;font-size:13px;color:var(--cream-dim);}
+.nasab{font-family:'Amiri',serif;font-size:14.5px;color:var(--gold-light);line-height:1.8;margin-bottom:10px;}
+.detail-rel b{color:var(--cream);}
+.modal-actions{display:flex;gap:8px;margin-top:18px;justify-content:center;flex-wrap:wrap;}
+.photo-btn{display:flex;align-items:center;justify-content:center;gap:8px;border:1px dashed rgba(201,161,90,0.5);border-radius:10px;padding:10px;cursor:pointer;color:var(--cream-dim);font-size:13px;}
+.photo-preview{width:60px;height:60px;border-radius:50%;object-fit:cover;margin-left:8px;}
+.err-toast{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--danger);color:#2a0f0d;padding:8px 16px;border-radius:8px;z-index:60;font-size:13px;}
+.spin{display:inline-block;animation:spin 1s linear infinite;}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+@media (min-width: 720px){
+  header{max-width:1100px;padding:24px 24px 16px;}
+  h1{font-size:38px;}
+  .sub{font-size:15px;}
+  .ft-btn{padding:11px 24px;font-size:15px;}
+  #canvasWrap{cursor:grab;}
+  #canvasWrap:active{cursor:grabbing;}
+  .ft-login-card{max-width:420px;padding:40px 34px;}
+  .ft-login-card h2{font-size:28px;}
+  .zoom button{width:44px;height:44px;font-size:18px;}
+}
+@media (min-width: 1100px){
+  header{max-width:1300px;}
+}
+
+/* ---- Mobile-friendly enhancements (additive only, does not remove/replace anything above) ---- */
+@media (max-width: 480px){
+  h1{font-size:26px;}
+  .sub{font-size:12.5px;}
+  .userbar{font-size:13px;gap:12px;}
+  .userbar button{font-size:13px;padding:4px 2px;}
+  .role-badge{font-size:12px;padding:4px 12px;}
+  .toolbar{gap:10px;}
+  .ft-btn{padding:11px 16px;font-size:14.5px;min-height:44px;}
+  .ft-btn.secondary{min-height:44px;}
+  .search{padding:9px 14px;min-width:150px;}
+  .search input{font-size:15px;}
+  .legend{gap:8px;}
+  .legend button{padding:7px 12px;font-size:12.5px;min-height:36px;}
+  .node{width:78px;padding:6px 5px;}
+  .node .name{font-size:12.5px;}
+  .node .years{font-size:10.5px;}
+  .zoom{left:12px;bottom:20px;gap:8px;}
+  .zoom button{width:46px;height:46px;font-size:20px;}
+  .modal{padding:18px;border-radius:16px;max-height:92vh;}
+  .modal-close{top:12px;left:12px;font-size:22px;padding:6px;}
+  .detail-name{font-size:20px;}
+  .modal-actions{gap:10px;}
+  .modal-actions .ft-btn{flex:1 1 auto;min-width:100px;min-height:46px;}
+  .ft-field input,.ft-field select,.ft-field textarea{padding:11px 12px;font-size:16px;}
+  .pw-toggle{font-size:18px;padding:8px;}
+}
+@media (max-width: 360px){
+  h1{font-size:22px;}
+  .node{width:70px;}
+  .node .name{font-size:11.5px;}
+}
+
+/* Hamburger-style dropdown for secondary header buttons: invisible wrapper on desktop, collapsible on mobile */
+.menu-details{display:contents;}
+.menu-summary{display:none;}
+@media (max-width: 480px){
+  .menu-details{display:inline-block;position:relative;}
+  .menu-summary{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:36px;height:36px;border-radius:50%;
+    background:var(--panel-2);border:1px solid rgba(201,161,90,0.4);
+    color:var(--gold-light);font-size:18px;cursor:pointer;
+  }
+  .menu-buttons{
+    flex-direction:column;gap:6px;
+    position:absolute;top:44px;left:50%;transform:translateX(-50%);
+    background:var(--panel);border:1px solid rgba(201,161,90,0.35);
+    border-radius:12px;padding:10px;z-index:30;min-width:200px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  }
+  .menu-buttons button{
+    text-align:right;padding:10px 12px;font-size:14px;min-height:40px;
+    border-radius:8px;background:var(--panel-2);text-decoration:none;
+  }
+}
+@media (min-width: 481px){
+  .menu-buttons{display:flex !important;}
+}
+
+/* On-tree kinship picking */
+.kinship-banner{
+  position:fixed;top:10px;left:50%;transform:translateX(-50%);
+  background:var(--panel);border:1px solid rgba(201,161,90,0.5);color:var(--cream);
+  padding:10px 16px;border-radius:12px;z-index:60;font-size:13px;
+  display:flex;align-items:center;gap:10px;max-width:90vw;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+.kinship-banner button{
+  background:var(--panel-2);border:1px solid rgba(201,161,90,0.4);color:var(--cream-dim);
+  border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer;flex-shrink:0;
+}
+.node.kinship-highlight{border-color:var(--gold-light)!important;box-shadow:0 0 16px 3px var(--gold-light);z-index:5;}
+.node.kinship-dim{opacity:0.15;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const DB_URL = "https://family-tree-9007d-default-rtdb.asia-southeast1.firebasedatabase.app";
+const TREE_ID = new URLSearchParams(window.location.search).get("tree") || "";
+const PATH_PREFIX = TREE_ID ? "trees/"+encodeURIComponent(TREE_ID)+"/" : "";
+const REMEMBER_KEY = "ft_remember_"+(TREE_ID||"default");
+function rememberSession(role, rawKeyB64){
+  try { localStorage.setItem(REMEMBER_KEY, JSON.stringify({role, rawKeyB64})); } catch(_) {}
+}
+function forgetSession(){
+  try { localStorage.removeItem(REMEMBER_KEY); } catch(_) {}
+}
+function loadRememberedSession(){
+  try { const raw = localStorage.getItem(REMEMBER_KEY); return raw ? JSON.parse(raw) : null; } catch(_) { return null; }
+}
+const ROW_HEIGHT = 110, COL_WIDTH = 105, NODE_W = 90, NODE_H = 52;
+const PAN_SPEED = 0.22; // fraction of raw finger/mouse movement actually applied to scrolling (lower = slower tree movement)
+
+// ---------- Firebase REST helpers ----------
+async function fbGet(path){ const r = await fetch(DB_URL+"/"+path+".json"); if(!r.ok) throw new Error("fb GET "+r.status); return r.json(); }
+async function fbSet(path,val){ const r = await fetch(DB_URL+"/"+path+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(val)}); if(!r.ok) throw new Error("fb PUT "+r.status); return r.json(); }
+async function fbDelete(path){ const r = await fetch(DB_URL+"/"+path+".json",{method:"DELETE"}); if(!r.ok) throw new Error("fb DEL "+r.status); }
+
+// ---------- Crypto helpers ----------
+function bufToB64(buf){ const b=new Uint8Array(buf); let s=""; for(let i=0;i<b.length;i++) s+=String.fromCharCode(b[i]); return btoa(s); }
+function b64ToBuf(b64){ const s=atob(b64); const b=new Uint8Array(s.length); for(let i=0;i<s.length;i++) b[i]=s.charCodeAt(i); return b.buffer; }
+function randomSaltB64(){ return bufToB64(crypto.getRandomValues(new Uint8Array(16)).buffer); }
+async function deriveKey(password, saltB64){
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt:b64ToBuf(saltB64), iterations:150000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
+}
+async function encryptText(key, text){
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const c = await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, new TextEncoder().encode(text));
+  return bufToB64(iv)+"."+bufToB64(c);
+}
+async function decryptText(key, combined){
+  const [ivB64,dataB64] = combined.split(".");
+  const iv = new Uint8Array(b64ToBuf(ivB64));
+  const p = await crypto.subtle.decrypt({name:"AES-GCM", iv}, key, b64ToBuf(dataB64));
+  return new TextDecoder().decode(p);
+}
+async function generateDataKeyRawB64(){
+  const key = await crypto.subtle.generateKey({name:"AES-GCM", length:256}, true, ["encrypt","decrypt"]);
+  return bufToB64(await crypto.subtle.exportKey("raw", key));
+}
+async function importDataKey(rawB64){
+  return crypto.subtle.importKey("raw", b64ToBuf(rawB64), {name:"AES-GCM"}, false, ["encrypt","decrypt"]);
+}
+async function wrapDataKeyFor(secret, rawDataKeyB64){
+  const salt = randomSaltB64();
+  const key = await deriveKey(secret, salt);
+  const wrap = await encryptText(key, rawDataKeyB64);
+  return {salt, wrap};
+}
+function generateRecoveryCode(){
+  const b = crypto.getRandomValues(new Uint8Array(15));
+  const hex = Array.from(b).map(x=>x.toString(16).padStart(2,"0")).join("").toUpperCase();
+  return hex.match(/.{1,4}/g).join("-");
+}
+function genLabel(n){ return n===1 ? "الجيل الأول — الجد الأكبر" : "الجيل "+n; }
+function uid(){ return "p_"+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+function elbowPath(x1,y1,x2,y2,r){
+  if (Math.abs(x1-x2) < 1) return "M "+x1+" "+y1+" L "+x2+" "+y2;
+  const midY=(y1+y2)/2, dir=x2>x1?1:-1;
+  const rr = Math.max(0, Math.min(r, Math.abs(x2-x1)/2, Math.abs(midY-y1), Math.abs(y2-midY)));
+  return "M "+x1+" "+y1+" L "+x1+" "+(midY-rr)+" Q "+x1+" "+midY+" "+(x1+rr*dir)+" "+midY+" L "+(x2-rr*dir)+" "+midY+" Q "+x2+" "+midY+" "+x2+" "+(midY+rr)+" L "+x2+" "+y2;
+}
+async function compressImage(file, maxSize=220, quality=0.72){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let {width,height} = img;
+        if (width>height){ if(width>maxSize){height*=maxSize/width; width=maxSize;} }
+        else { if(height>maxSize){width*=maxSize/height; height=maxSize;} }
+        const c = document.createElement("canvas"); c.width=width; c.height=height;
+        c.getContext("2d").drawImage(img,0,0,width,height);
+        resolve(c.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ---------- App state ----------
+const state = {
+  mode: "checking", // checking|unsupported|setup|setup-recovery|login|forgot|forgot-newpass|app
+  session: null, // {role, cryptoKey}
+  people: {},
+  search: "",
+  highlightGen: null,
+  zoom: 1,
+  detailId: null,
+  editId: null,
+  confirmDeleteId: null,
+  err: "",
+  busy: false,
+  pendingDataKeyB64: null,
+  recoveryCode: "",
+  savedConfirmed: false,
+  syncing: false,
+  lastFitKey: null,
+  showStats: false,
+  showKinship: false,
+  kinshipA: "",
+  kinshipB: "",
+  kinshipMode: null,
+  kinshipPickA: null,
+  kinshipPickB: null,
+  showChangePw: false,
+  familyName: "",
+  showFamilyName: false,
+  menuOpen: false,
+  confirmImport: false,
+  showExportModal: false,
+  showImportPasteModal: false,
+  exportJson: "",
+  copiedFlag: false,
+};
+
+const app = document.getElementById("app");
+let pollTimer = null;
+let gestureActive = false; // true while the user is actively dragging/pinching the tree
+function updateAppTitle(familyName){
+  const full = familyName ? "شجرة عائلة "+familyName : "شجرة العائلة";
+  document.title = full;
+  const meta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if (meta) meta.setAttribute("content", full);
+}
+let globalMouseDrag = {active:false, lastX:0, lastY:0, wrap:null};
+window.addEventListener("mousemove", e => {
+  if (!globalMouseDrag.active || !globalMouseDrag.wrap) return;
+  globalMouseDrag.wrap.scrollLeft -= (e.clientX-globalMouseDrag.lastX)*PAN_SPEED;
+  globalMouseDrag.wrap.scrollTop -= (e.clientY-globalMouseDrag.lastY)*PAN_SPEED;
+  globalMouseDrag.lastX = e.clientX; globalMouseDrag.lastY = e.clientY;
+});
+window.addEventListener("mouseup", () => {
+  if (globalMouseDrag.wrap) globalMouseDrag.wrap.style.cursor = "grab";
+  globalMouseDrag.active = false;
+  gestureActive = false;
+});
+document.addEventListener("click", (e) => {
+  if (!state.menuOpen) return;
+  const menuDetailsEl = document.querySelector(".menu-details");
+  if (menuDetailsEl && !menuDetailsEl.contains(e.target)){
+    state.menuOpen = false;
+    if (state.mode === "app") renderApp();
+  }
+});
+
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+// ---------- Layout ----------
+function computeEffectiveGen(people){
+  const childrenMap = {};
+  Object.values(people).forEach(p=>{ if(p.parentId && people[p.parentId]) (childrenMap[p.parentId]=childrenMap[p.parentId]||[]).push(p.id); });
+  const roots = Object.values(people).filter(p=>!p.parentId || !people[p.parentId]).map(p=>p.id);
+  const effectiveGen = {};
+  function assignGen(id, g){
+    if (effectiveGen[id] !== undefined) return;
+    effectiveGen[id] = g;
+    (childrenMap[id]||[]).forEach(cid => assignGen(cid, g+1));
+  }
+  roots.forEach(id => assignGen(id, 1));
+  Object.values(people).forEach(p => { if (effectiveGen[p.id] === undefined) assignGen(p.id, 1); });
+  return effectiveGen;
+}
+function computeLayout(people){
+  const list = Object.values(people);
+  const childrenMap = {};
+  list.forEach(p=>{ if(p.parentId && people[p.parentId]) (childrenMap[p.parentId]=childrenMap[p.parentId]||[]).push(p.id); });
+  const roots = list.filter(p=>!p.parentId || !people[p.parentId]).map(p=>p.id);
+  const rankOf = id => (people[id].order ?? people[id].createdAt ?? 0);
+  roots.sort((a,b)=> rankOf(a)-rankOf(b));
+  Object.values(childrenMap).forEach(arr=>arr.sort((a,b)=> rankOf(a)-rankOf(b)));
+  const effectiveGen = computeEffectiveGen(people);
+
+  // Siblings (same parent) are packed close together; different branches get a bit more air.
+  const xPos = {}; let cursor = 0; let lastParentId = undefined; const visited = new Set();
+  function assignX(id, parentId){
+    if (visited.has(id)) return xPos[id];
+    visited.add(id);
+    const kids = childrenMap[id]||[];
+    if (kids.length===0){
+      if (lastParentId !== undefined) cursor += (parentId===lastParentId ? 0.95 : 1.3);
+      xPos[id]=cursor; lastParentId = parentId;
+    }
+    else { kids.forEach(k=>assignX(k,id)); const xs=kids.map(k=>xPos[k]); xPos[id]=(Math.min(...xs)+Math.max(...xs))/2; }
+    return xPos[id];
+  }
+  roots.forEach(id=>assignX(id, null));
+  list.forEach(p=>{ if(!visited.has(p.id)) assignX(p.id, p.parentId||null); });
+
+  const maxGen = Math.max(1, ...list.map(p=>effectiveGen[p.id]||1));
+  const positions = {};
+  list.forEach(p=>{ const g=Math.max(effectiveGen[p.id]||1,1); positions[p.id] = {x: xPos[p.id]??0, row: g-1, gen: g}; });
+  const width = (cursor+2)*COL_WIDTH + 220;
+  const height = maxGen*ROW_HEIGHT + 140;
+  const genRowStart = {}; for (let g=1; g<=maxGen; g++) genRowStart[g] = g-1;
+  return {positions, width, height, maxGen, genRowStart};
+}
+const pxX = x => 80 + x*COL_WIDTH;
+const pxY = row => 60 + row*ROW_HEIGHT;
+function siblingsUnder(people, parentId, excludeId){
+  const key = parentId || null;
+  return Object.values(people)
+    .filter(p => (p.parentId||null) === key && p.id !== excludeId)
+    .sort((a,b) => (a.order ?? a.createdAt ?? 0) - (b.order ?? b.createdAt ?? 0));
+}
+function scrollToPerson(id){
+  requestAnimationFrame(() => {
+    const wrap = document.getElementById("canvasWrap");
+    const node = wrap && document.querySelector('.node[data-id="'+id+'"]');
+    if (!wrap || !node) return;
+    const zoom = state.zoom || 1;
+    const targetLeft = (node.offsetLeft + node.offsetWidth/2) * zoom - wrap.clientWidth/2;
+    const targetTop = (node.offsetTop + node.offsetHeight/2) * zoom - wrap.clientHeight/2;
+    wrap.scrollLeft = Math.max(0, targetLeft);
+    wrap.scrollTop = Math.max(0, targetTop);
+  });
+}
+// Zoom while keeping the point under (anchorX, anchorY) — coordinates relative to the wrap viewport — visually fixed.
+// If anchorX/anchorY are omitted, anchors on the current viewport center.
+function applyZoomFactor(factor){
+  const wrap = document.getElementById("canvasWrap");
+  const oldZoom = state.zoom;
+  const newZoom = Math.min(1.6, Math.max(0.08, Math.round(oldZoom*factor*100)/100));
+  if (!wrap){ state.zoom = newZoom; renderApp(); return; }
+  const ax = wrap.clientWidth/2, ay = wrap.clientHeight/2;
+  const contentX = (wrap.scrollLeft + ax) / oldZoom;
+  const contentY = (wrap.scrollTop + ay) / oldZoom;
+  state.zoom = newZoom;
+  renderApp();
+  const newWrap = document.getElementById("canvasWrap");
+  if (newWrap){
+    newWrap.scrollLeft = Math.max(0, contentX*newZoom - ax);
+    newWrap.scrollTop = Math.max(0, contentY*newZoom - ay);
+  }
+}
+
+// ---------- Cloud sync ----------
+async function loadAuthRecord(){
+  try { return await fbGet(PATH_PREFIX+"auth"); } catch(_) { return null; }
+}
+async function saveAuthRecord(rec){ await fbSet(PATH_PREFIX+"auth", rec); }
+async function loadMeta(){
+  try { const m = await fbGet(PATH_PREFIX+"meta"); return m || {}; } catch(_) { return {}; }
+}
+async function saveMeta(meta){ await fbSet(PATH_PREFIX+"meta", meta); }
+
+async function loadPeople(){
+  try {
+    const [data, meta] = await Promise.all([fbGet(PATH_PREFIX+"persons"), loadMeta()]);
+    const loaded = {};
+    if (data){
+      for (const cipher of Object.values(data)){
+        try {
+          const plain = await decryptText(state.session.cryptoKey, cipher);
+          const p = JSON.parse(plain);
+          if (!Array.isArray(p.photos)) p.photos = p.photo ? [p.photo] : [];
+          loaded[p.id] = p;
+        } catch(_) {}
+      }
+    }
+    state.people = loaded;
+    if (meta.familyNameEnc){
+      try { state.familyName = await decryptText(state.session.cryptoKey, meta.familyNameEnc); }
+      catch(_) { state.familyName = ""; }
+    } else {
+      state.familyName = meta.familyName || "";
+    }
+    if (state.familyName) updateAppTitle(state.familyName);
+    render();
+  } catch(e){
+    state.err = "تعذّر تحميل البيانات.";
+    render();
+  }
+}
+async function savePersonCloud(person){
+  state.people[person.id] = person;
+  render();
+  state.syncing = true; render();
+  try {
+    const cipher = await encryptText(state.session.cryptoKey, JSON.stringify(person));
+    await fbSet(PATH_PREFIX+"persons/"+person.id, cipher);
+  } catch(e){ state.err = "تعذّر الحفظ في السحابة."; }
+  state.syncing = false; render();
+}
+async function deletePersonCloud(id){
+  delete state.people[id];
+  Object.values(state.people).forEach(p=>{
+    if (p.parentId===id) p.parentId=null;
+  });
+  state.confirmDeleteId = null; state.detailId = null;
+  render();
+  state.syncing = true; render();
+  try { await fbDelete(PATH_PREFIX+"persons/"+id); } catch(e){ state.err = "تعذّر الحذف من السحابة."; }
+  state.syncing = false; render();
+}
+
+// ---------- Render ----------
+function render(){
+  if (state.mode === "app") { renderApp(); return; }
+  renderLogin();
+}
+
+function renderLogin(){
+  let html = '<div class="ft-login-wrap"><div class="ft-login-card">';
+  const treeTag = TREE_ID ? '<div style="font-size:12px;color:var(--gold);margin-bottom:10px;">🌳 الشجرة: '+esc(TREE_ID)+'</div>' : '';
+  html += treeTag;
+  const loginTitle = state.familyName ? 'شجرة عائلة '+esc(state.familyName) : 'شجرة العائلة';
+  if (state.mode === "checking"){
+    html += '<div class="spin" style="font-size:24px;">⏳</div>';
+  } else if (state.mode === "unsupported"){
+    html += '<h2>المتصفح لا يدعم التشفير</h2><p>افتح هذه الصفحة في متصفح حديث (Safari أو Chrome).</p>';
+  } else if (state.mode === "setup-recovery"){
+    html += '<h2>احفظ رمز الاسترداد الآن</h2><p>الطريقة الوحيدة لاستعادة الوصول إذا نُسيت كل كلمات المرور. لن يُعرض مرة أخرى.</p>'
+      + '<div class="ft-recovery-code">'+esc(state.recoveryCode)+'</div>'
+      + '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cream-dim);margin:16px 0;text-align:right;">'
+      + '<input type="checkbox" id="savedChk" '+(state.savedConfirmed?'checked':'')+'> حفظت هذا الرمز في مكان آمن</label>'
+      + '<button class="ft-btn" id="finishSetupBtn" '+(state.savedConfirmed?'':'disabled')+' style="width:100%;justify-content:center;">متابعة إلى الشجرة</button>';
+  } else if (state.mode === "setup"){
+    html += '<h2>'+loginTitle+'</h2><p>هذه أول زيارة — اختر ثلاث كلمات مرور منفصلة: للمسؤول الأول (أنت)، للمحرِّرين، وللمشاهدين فقط.</p>'
+      + threeTierFields()
+      + errBlock()
+      + '<button class="ft-btn" id="setupBtn" style="width:100%;justify-content:center;" '+(state.busy?'disabled':'')+'>'+(state.busy?'جارٍ الإعداد...':'تعيين كلمات المرور')+'</button>';
+  } else if (state.mode === "forgot"){
+    html += '<h2>استرداد الوصول</h2><p>أدخل رمز الاسترداد المحفوظ. سيمنحك هذا صلاحية المسؤول الأول من جديد.</p>'
+      + field("recInput","رمز الاسترداد","text","XXXX-XXXX-XXXX-...")
+      + errBlock()
+      + '<button class="ft-btn" id="recoverBtn" style="width:100%;justify-content:center;" '+(state.busy?'disabled':'')+'>'+(state.busy?'جارٍ التحقق...':'تحقق من الرمز')+'</button>'
+      + '<button class="ft-btn secondary" id="backToLoginBtn" style="width:100%;justify-content:center;margin-top:8px;">رجوع لتسجيل الدخول</button>';
+  } else if (state.mode === "forgot-newpass"){
+    html += '<h2>تعيين كلمات مرور جديدة</h2><p>تم التحقق بنجاح — أنت الآن المسؤول الأول.</p>'
+      + threeTierFields()
+      + errBlock()
+      + '<button class="ft-btn" id="newPassBtn" style="width:100%;justify-content:center;" '+(state.busy?'disabled':'')+'>'+(state.busy?'جارٍ الحفظ...':'حفظ والدخول')+'</button>';
+  } else { // login
+    html += '<h2>'+loginTitle+'</h2><p>أدخل كلمة مرور المسؤول أو المحرِّر أو المشاهدة.</p>'
+      + field("loginPw","كلمة المرور","password")
+      + errBlock()
+      + '<button class="ft-btn" id="loginBtn" style="width:100%;justify-content:center;" '+(state.busy?'disabled':'')+'>'+(state.busy?'جارٍ التحقق...':'دخول')+'</button>'
+      + '<button class="ft-btn secondary" id="forgotBtn" style="width:100%;justify-content:center;margin-top:8px;">نسيت كلمات المرور؟</button>';
+  }
+  html += '</div></div>';
+  app.innerHTML = html;
+  wireLoginEvents();
+}
+function threeTierFields(){
+  return '<div style="text-align:right;font-size:12.5px;color:var(--gold-light);font-weight:700;margin:14px 0 6px;">👑 المسؤول الأول (كل الصلاحيات + تغيير كلمات المرور)</div>'
+    + field("adminPw","كلمة مرور المسؤول","password")
+    + field("adminPw2","تأكيد كلمة مرور المسؤول","password")
+    + '<div style="text-align:right;font-size:12.5px;color:var(--gold-light);font-weight:700;margin:14px 0 6px;">✏️ المحرِّرون (إضافة وتعديل الأفراد فقط)</div>'
+    + field("editPw","كلمة مرور التعديل","password")
+    + field("editPw2","تأكيد كلمة مرور التعديل","password")
+    + '<div style="text-align:right;font-size:12.5px;color:var(--gold-light);font-weight:700;margin:14px 0 6px;">👁️ المشاهدون (عرض فقط)</div>'
+    + field("viewPw","كلمة مرور المشاهدة","password")
+    + field("viewPw2","تأكيد كلمة مرور المشاهدة","password");
+}
+function field(id,label,type,placeholder,value){
+  if (type === "password"){
+    return '<div class="ft-field"><label>'+label+'</label><div style="position:relative;">'
+      + '<input type="password" id="'+id+'" '+(placeholder?'placeholder="'+placeholder+'"':'')+(value?' value="'+esc(value)+'"':'')+' autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" style="padding-left:38px;">'
+      + '<button type="button" class="pw-toggle" data-target="'+id+'" style="position:absolute;left:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--cream-dim);cursor:pointer;font-size:16px;padding:4px;">👁️</button>'
+      + '</div></div>';
+  }
+  return '<div class="ft-field"><label>'+label+'</label><input type="'+type+'" id="'+id+'" '+(placeholder?'placeholder="'+placeholder+'"':'')+(value?' value="'+esc(value)+'"':'')+' autocomplete="off"></div>';
+}
+function errBlock(){ return state.err ? '<div class="ft-err">'+esc(state.err)+'</div>' : ''; }
+
+function wireLoginEvents(){
+  const savedChk = document.getElementById("savedChk");
+  if (savedChk) savedChk.onchange = e => { state.savedConfirmed = e.target.checked; render(); };
+  const finishBtn = document.getElementById("finishSetupBtn");
+  if (finishBtn) finishBtn.onclick = async () => {
+    const cryptoKey = await importDataKey(state.pendingDataKeyB64);
+    state.session = {role:"admin", cryptoKey, rawKeyB64: state.pendingDataKeyB64};
+      rememberSession("admin", state.pendingDataKeyB64);
+    state.mode = "app";
+    render();
+    await loadPeople();
+    startPolling();
+  };
+  function validateThreeTier(){
+    const adminPw=val("adminPw"), adminPw2=val("adminPw2"), editPw=val("editPw"), editPw2=val("editPw2"), viewPw=val("viewPw"), viewPw2=val("viewPw2");
+    if (adminPw.length<6) return "كلمة مرور المسؤول 6 أحرف على الأقل.";
+    if (adminPw!==adminPw2) return "كلمتا مرور المسؤول غير متطابقتين.";
+    if (editPw.length<6) return "كلمة مرور التعديل 6 أحرف على الأقل.";
+    if (editPw!==editPw2) return "كلمتا مرور التعديل غير متطابقتين.";
+    if (viewPw.length<6) return "كلمة مرور المشاهدة 6 أحرف على الأقل.";
+    if (viewPw!==viewPw2) return "كلمتا مرور المشاهدة غير متطابقتين.";
+    const set = new Set([adminPw,editPw,viewPw]);
+    if (set.size < 3) return "اجعل الكلمات الثلاث مختلفة عن بعضها.";
+    return null;
+  }
+  const setupBtn = document.getElementById("setupBtn");
+  if (setupBtn) setupBtn.onclick = async () => {
+    state.err = "";
+    const errMsg = validateThreeTier();
+    if (errMsg){ state.err = errMsg; render(); return; }
+    const adminPw=val("adminPw"), editPw=val("editPw"), viewPw=val("viewPw");
+    state.busy = true; render();
+    try {
+      const rawKey = await generateDataKeyRawB64();
+      const adminWrap = await wrapDataKeyFor(adminPw, rawKey);
+      const editWrap = await wrapDataKeyFor(editPw, rawKey);
+      const viewWrap = await wrapDataKeyFor(viewPw, rawKey);
+      const code = generateRecoveryCode();
+      const recWrap = await wrapDataKeyFor(code, rawKey);
+      await saveAuthRecord({
+        adminSalt:adminWrap.salt, adminWrap:adminWrap.wrap,
+        editSalt:editWrap.salt, editWrap:editWrap.wrap,
+        viewSalt:viewWrap.salt, viewWrap:viewWrap.wrap,
+        recSalt:recWrap.salt, recWrap:recWrap.wrap,
+      });
+      state.recoveryCode = code;
+      state.pendingDataKeyB64 = rawKey;
+      state.mode = "setup-recovery";
+    } catch(e){ state.err = "تعذّر الإعداد: "+(e.message||e); }
+    state.busy = false; render();
+  };
+  const loginBtn = document.getElementById("loginBtn");
+  if (loginBtn) loginBtn.onclick = async () => {
+    const pw = val("loginPw");
+    state.err = ""; state.busy = true; render();
+    try {
+      const rec = await loadAuthRecord();
+      let role = null, cryptoKey = null, rawKeyB64 = null;
+      try {
+        const k = await deriveKey(pw, rec.adminSalt);
+        const raw = await decryptText(k, rec.adminWrap);
+        cryptoKey = await importDataKey(raw); role = "admin"; rawKeyB64 = raw;
+      } catch(_) {}
+      if (!role){
+        try {
+          const k = await deriveKey(pw, rec.editSalt);
+          const raw = await decryptText(k, rec.editWrap);
+          cryptoKey = await importDataKey(raw); role = "editor"; rawKeyB64 = raw;
+        } catch(_) {}
+      }
+      if (!role){
+        const k = await deriveKey(pw, rec.viewSalt);
+        const raw = await decryptText(k, rec.viewWrap);
+        cryptoKey = await importDataKey(raw); role = "viewer"; rawKeyB64 = raw;
+      }
+      state.session = {role, cryptoKey, rawKeyB64};
+      rememberSession(role, rawKeyB64);
+      state.mode = "app";
+      render();
+      await loadPeople();
+      startPolling();
+    } catch(e){ state.err = "كلمة المرور غير صحيحة."; }
+    state.busy = false; render();
+  };
+  const forgotBtn = document.getElementById("forgotBtn");
+  if (forgotBtn) forgotBtn.onclick = () => { state.mode="forgot"; state.err=""; render(); };
+  const backBtn = document.getElementById("backToLoginBtn");
+  if (backBtn) backBtn.onclick = () => { state.mode="login"; state.err=""; render(); };
+  const recoverBtn = document.getElementById("recoverBtn");
+  if (recoverBtn) recoverBtn.onclick = async () => {
+    const code = val("recInput").trim().toUpperCase();
+    state.err = ""; state.busy = true; render();
+    try {
+      const rec = await loadAuthRecord();
+      const k = await deriveKey(code, rec.recSalt);
+      const raw = await decryptText(k, rec.recWrap);
+      state.pendingDataKeyB64 = raw;
+      state.mode = "forgot-newpass";
+    } catch(e){ state.err = "رمز الاسترداد غير صحيح."; }
+    state.busy = false; render();
+  };
+  const newPassBtn = document.getElementById("newPassBtn");
+  if (newPassBtn) newPassBtn.onclick = async () => {
+    state.err = "";
+    const errMsg = validateThreeTier();
+    if (errMsg){ state.err = errMsg; render(); return; }
+    const adminPw=val("adminPw"), editPw=val("editPw"), viewPw=val("viewPw");
+    state.busy = true; render();
+    try {
+      const rec = await loadAuthRecord();
+      const adminWrap = await wrapDataKeyFor(adminPw, state.pendingDataKeyB64);
+      const editWrap = await wrapDataKeyFor(editPw, state.pendingDataKeyB64);
+      const viewWrap = await wrapDataKeyFor(viewPw, state.pendingDataKeyB64);
+      await saveAuthRecord({
+        ...rec,
+        adminSalt:adminWrap.salt, adminWrap:adminWrap.wrap,
+        editSalt:editWrap.salt, editWrap:editWrap.wrap,
+        viewSalt:viewWrap.salt, viewWrap:viewWrap.wrap,
+      });
+      const cryptoKey = await importDataKey(state.pendingDataKeyB64);
+      state.session = {role:"admin", cryptoKey, rawKeyB64: state.pendingDataKeyB64};
+      rememberSession("admin", state.pendingDataKeyB64);
+      state.mode = "app";
+      render();
+      await loadPeople();
+      startPolling();
+    } catch(e){ state.err = "تعذّر الحفظ."; }
+    state.busy = false; render();
+  };
+  wirePasswordToggles();
+}
+function wirePasswordToggles(){
+  document.querySelectorAll(".pw-toggle").forEach(btn => btn.onclick = () => {
+    const input = document.getElementById(btn.dataset.target);
+    if (!input) return;
+    if (input.type === "password"){ input.type = "text"; btn.textContent = "🙈"; }
+    else { input.type = "password"; btn.textContent = "👁️"; }
+  });
+}
+function val(id){ const el = document.getElementById(id); return el ? el.value.trim() : ""; }
+
+function startPolling(){
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(() => {
+    if (state.mode==="app" && state.session && !state.editId && !state.showChangePw && !state.showFamilyName && !gestureActive) loadPeople();
+  }, 7000);
+}
+
+// ---------- Main app render ----------
+function renderApp(){
+  const isAdmin = state.session.role === "admin";
+  const isEditor = isAdmin || state.session.role === "editor";
+  const layout = computeLayout(state.people);
+  const peopleCount = Object.keys(state.people).length;
+
+  let kinshipHighlightSet = null;
+  if (state.kinshipMode === "result" && state.kinshipPickA && state.kinshipPickB){
+    kinshipHighlightSet = new Set();
+    const r = findCommonAncestor(state.kinshipPickA, state.kinshipPickB);
+    if (r){
+      let cur = state.people[state.kinshipPickA], guard=0;
+      while (cur && guard<100){ kinshipHighlightSet.add(cur.id); if (cur.id===r.ancestorId) break; cur = cur.parentId ? state.people[cur.parentId] : null; guard++; }
+      cur = state.people[state.kinshipPickB]; guard=0;
+      while (cur && guard<100){ kinshipHighlightSet.add(cur.id); if (cur.id===r.ancestorId) break; cur = cur.parentId ? state.people[cur.parentId] : null; guard++; }
+    } else {
+      kinshipHighlightSet.add(state.kinshipPickA); kinshipHighlightSet.add(state.kinshipPickB);
+    }
+  }
+
+  let html = '';
+  if (state.err) html += '<div class="err-toast">'+esc(state.err)+'</div>';
+  if (state.kinshipMode === "picking" || state.kinshipMode === "result"){
+    let bannerText = "";
+    if (state.kinshipMode === "picking"){
+      bannerText = state.kinshipPickA ? "اختر الشخص الثاني من الشجرة..." : "اختر الشخص الأول من الشجرة...";
+    } else {
+      const r = findCommonAncestor(state.kinshipPickA, state.kinshipPickB);
+      const nameA = esc(state.people[state.kinshipPickA]?.name||"");
+      const nameB = esc(state.people[state.kinshipPickB]?.name||"");
+      if (!r){
+        bannerText = "لا يوجد جد مشترك مسجّل بين "+nameA+" و"+nameB+".";
+      } else if (r.distA===0 || r.distB===0){
+        const parentName = r.distA===0?nameA:nameB, childName = r.distA===0?nameB:nameA, dist=Math.max(r.distA,r.distB);
+        bannerText = "<b>"+parentName+"</b> سلف مباشر لـ<b>"+childName+"</b> ("+dist+" "+(dist===1?"جيل":"أجيال")+")";
+      } else {
+        const ancestorName = esc(state.people[r.ancestorId]?.name||"");
+        bannerText = "الجد المشترك: <b>"+ancestorName+"</b> — "+nameA+" ("+r.distA+") و"+nameB+" ("+r.distB+")"+(r.distA===1&&r.distB===1?" — إخوة/أخوات":"");
+      }
+    }
+    html += '<div class="kinship-banner">'+bannerText+' <button id="kinshipCancelBtn">✕ إلغاء</button></div>';
+  }
+  const titleText = state.familyName ? 'شجرة عائلة '+esc(state.familyName) : 'شجرة العائلة';
+  const treeIdAddsInfo = TREE_ID && !state.familyName;
+  html += '<header><h1>'+titleText+(treeIdAddsInfo?' <span style="font-size:14px;color:var(--cream-dim);">('+esc(TREE_ID)+')</span>':'')+'</h1><div class="sub">'
+    + (peopleCount>0 ? peopleCount+' فرداً · '+layout.maxGen+' '+(layout.maxGen===1?'جيل':'أجيال') : 'ابدأ ببناء شجرة عائلتك')
+    + (state.syncing ? ' <span class="spin">⏳</span>' : '')
+    + '</div>'
+    + '<div class="userbar"><span class="role-badge">'+(isAdmin?'👑 مسؤول أول':(isEditor?'✏️ محرِّر':'👁️ مشاهد فقط'))+'</span>'
+    + '<div class="menu-details"><button type="button" class="menu-summary" id="menuToggleBtn">⋯</button><div class="menu-buttons" style="display:'+(state.menuOpen?'flex':'none')+';">'
+    + '<button id="syncNowBtn">🔄 تحديث الآن</button>'
+    + (isAdmin ? '<button id="changePwBtn">🔑 تغيير كلمات المرور</button>' : '')
+    + (isAdmin ? '<button id="editFamilyNameBtn">🖋 اسم العائلة</button>' : '')
+    + (isAdmin ? '<button id="exportDataBtn">💾 نسخة احتياطية</button>' : '')
+    + (isAdmin ? '<button id="importDataBtn">📥 استيراد ملف</button>' : '')
+    + (isAdmin ? '<button id="importPasteBtn">📋 استيراد بلصق نص</button>' : '')
+    + (isAdmin ? '<input type="file" accept="application/json,.json" id="importDataInput" style="display:none;">' : '')
+    + '<button id="logoutBtn">🚪 خروج</button>'
+    + '</div></div></div>'
+
+    + '<div class="toolbar">'
+    + (isEditor ? '<button class="ft-btn" id="addPersonBtn">➕ إضافة فرد</button>' : '')
+    + '<button class="ft-btn secondary" id="showStatsBtn">📊 إحصائيات</button>'
+    + '<button class="ft-btn secondary" id="showKinshipBtn">🔗 القرابة بين شخصين</button>'
+    + '<div class="search"><input id="searchInput" dir="rtl" placeholder="ابحث عن اسم..." value="'+esc(state.search)+'"></div>'
+    + '</div>'
+    + '<div class="legend">';
+  for (let g=1; g<=layout.maxGen; g++) html += '<button data-gen="'+g+'">'+esc(genLabel(g))+'</button>';
+  html += '</div></header>';
+
+  html += '<div id="canvasWrap" dir="ltr">';
+  if (peopleCount === 0){
+    html += '<div class="empty"><div style="font-size:40px;">👤</div><div>لا يوجد أفراد بعد</div>'
+      + (isEditor ? '<button class="ft-btn" id="addFirstBtn">➕ أضف الجد الأكبر</button>' : '') + '</div>';
+  } else {
+    html += '<div id="canvasSizer" style="position:relative;width:'+(layout.width*state.zoom)+'px;height:'+(layout.height*state.zoom)+'px;">';
+    html += '<div id="canvas" style="position:absolute;top:0;left:0;width:'+layout.width+'px;height:'+layout.height+'px;transform:scale('+state.zoom+');transform-origin:top left;">';
+    html += '<svg width="'+layout.width+'" height="'+layout.height+'" style="position:absolute;top:0;left:0;"><defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#C9A15A" stop-opacity="0.9"/><stop offset="100%" stop-color="#C9A15A" stop-opacity="0.3"/></linearGradient></defs>';
+    Object.values(state.people).forEach(p=>{
+      if (!p.parentId || !layout.positions[p.parentId]) return;
+      const pp = layout.positions[p.parentId], cp = layout.positions[p.id];
+      const x1 = layout.width - (pxX(pp.x)+NODE_W/2), y1 = pxY(pp.row)+NODE_H;
+      const x2 = layout.width - (pxX(cp.x)+NODE_W/2), y2 = pxY(cp.row);
+      const inChain = kinshipHighlightSet && kinshipHighlightSet.has(p.id) && kinshipHighlightSet.has(p.parentId);
+      const dimmed = kinshipHighlightSet && !inChain;
+      const strokeColor = inChain ? "#E9CD8C" : "#C9A15A";
+      const strokeWidth = inChain ? "4" : "2.5";
+      const opacity = dimmed ? "0.12" : "1";
+      html += '<path d="'+elbowPath(x1,y1,x2,y2,14)+'" stroke="'+strokeColor+'" stroke-width="'+strokeWidth+'" fill="none" opacity="'+opacity+'"/>';
+    });
+    html += '</svg>';
+    for (let g=1; g<=layout.maxGen; g++) html += '<div class="genlabel" style="top:'+(pxY(layout.genRowStart[g])-30)+'px;">'+esc(genLabel(g))+'</div>';
+    Object.values(state.people).forEach(p=>{
+      const pos = layout.positions[p.id]; if (!pos) return;
+      const match = (state.search.trim() && p.name && p.name.includes(state.search.trim())) || (state.highlightGen && pos.gen === state.highlightGen);
+      const isDeceased = p.deceased || (p.deathYear && String(p.deathYear).trim());
+      const isPicked = (state.kinshipPickA===p.id || state.kinshipPickB===p.id);
+      const inHighlightSet = kinshipHighlightSet && kinshipHighlightSet.has(p.id);
+      const kinshipDim = kinshipHighlightSet && !inHighlightSet;
+      const kinshipHL = isPicked || inHighlightSet;
+      html += '<div class="node'+(p.gender==='f'?' female':'')+(isDeceased?' deceased':'')+(match?' match':'')+(kinshipHL?' kinship-highlight':'')+(kinshipDim?' kinship-dim':'')+'" data-id="'+p.id+'" style="top:'+pxY(pos.row)+'px;right:'+pxX(pos.x)+'px;">'
+        + '<div class="name">'+esc(p.name)+'</div><div class="years">'+'\u2067'+esc(p.birthYear||'')+(p.deathYear?' – '+esc(p.deathYear):(p.deceased?' – متوفى':''))+'\u2069'+'</div></div>';
+    });
+    html += '</div></div>';
+  }
+  html += '</div>';
+  if (peopleCount>0) html += '<div class="zoom"><button id="zoomInBtn">+</button><button id="zoomOutBtn">−</button></div>';
+
+  // Modals
+  if (state.detailId && state.people[state.detailId]) html += renderDetailModal(state.people[state.detailId], isEditor);
+  if (isEditor && state.editId) html += renderEditModal();
+  if (isEditor && state.confirmDeleteId) html += renderConfirmDelete();
+  if (state.showStats) html += renderStatsModal();
+  if (state.showKinship) html += renderKinshipModal();
+  if (isAdmin && state.showChangePw) html += renderChangePwModal();
+  if (isAdmin && state.showFamilyName) html += renderFamilyNameModal();
+  if (isAdmin && state.confirmImport) html += renderConfirmImport();
+  if (isAdmin && state.showExportModal) html += renderExportModal();
+  if (isAdmin && state.showImportPasteModal) html += renderImportPasteModal();
+
+  const prevWrap = document.getElementById("canvasWrap");
+  const prevScroll = prevWrap ? {left: prevWrap.scrollLeft, top: prevWrap.scrollTop} : null;
+  app.innerHTML = html;
+  wireAppEvents(layout);
+  if (prevScroll){
+    const newWrap = document.getElementById("canvasWrap");
+    if (newWrap){ newWrap.scrollLeft = prevScroll.left; newWrap.scrollTop = prevScroll.top; }
+  }
+}
+
+function renderDetailModal(p, isEditor){
+  const children = Object.values(state.people).filter(c=>c.parentId===p.id).sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  const motherName = p.motherName || "";
+  const husbandName = p.husbandName || "";
+  const wifeName = p.wifeName || "";
+  const spouseName = p.spouseName || ""; // legacy field, shown if present on old entries
+  let nasabChain = "";
+  { let cur = p, guard = 0, parts = [esc(p.name)];
+    while (cur.parentId && state.people[cur.parentId] && guard < 100){
+      const parent = state.people[cur.parentId];
+      parts.push((cur.gender==='f' ? 'بنت' : 'بن') + ' ' + esc(parent.name));
+      cur = parent; guard++;
+    }
+    if (parts.length > 1) nasabChain = parts.join(' ');
+  }
+  const photos = Array.isArray(p.photos) ? p.photos : (p.photo ? [p.photo] : []);
+  let html = '<div class="overlay" id="detailOverlay"><div class="modal" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeDetailBtn">✕</button>'
+    + '<div class="detail-avatar">'+(photos[0]?'<img src="'+photos[0]+'">':'👤')+'</div>';
+  if (photos.length > 1){
+    html += '<div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">';
+    photos.forEach((ph,i)=>{
+      html += '<img src="'+ph+'" class="gallery-thumb" data-idx="'+i+'" style="width:44px;height:44px;border-radius:8px;object-fit:cover;cursor:pointer;border:1.5px solid rgba(201,161,90,0.4);">';
+    });
+    html += '</div>';
+  }
+  html += '<div class="detail-name">'+esc(p.name)+'</div>'
+    + '<div class="detail-meta">'+'\u2067'+esc(p.birthYear||'')+(p.deathYear?' – '+esc(p.deathYear):(p.deceased?' – متوفى':''))+'\u2069'+'</div>'
+    + (p.bio ? '<div class="detail-bio">'+esc(p.bio)+'</div>' : '')
+    + '<div class="detail-rel">'
+    + (nasabChain ? '<div class="nasab">'+nasabChain+'</div>' : '')
+    + (motherName ? '<div>الأم: <b>'+esc(motherName)+'</b></div>' : '')
+    + (p.gender==='f' && husbandName ? '<div>❤ الزوج: <b>'+esc(husbandName)+'</b></div>' : '')
+    + (p.gender==='m' && wifeName ? '<div>❤ الزوجة: <b>'+esc(wifeName)+'</b></div>' : '')
+    + (spouseName ? '<div>❤ الزوج/الزوجة: <b>'+esc(spouseName)+'</b></div>' : '')
+    + (children.length ? '<div>الأولاد: <b>'+children.map(c=>esc(c.name)).join('، ')+'</b></div>' : '')
+    + '</div>';
+  if (isEditor){
+    html += '<div class="modal-actions">'
+      + '<button class="ft-btn" id="addChildBtn" data-id="'+p.id+'">➕ إضافة ابن/ابنة</button>'
+      + '<button class="ft-btn secondary" id="editPersonBtn" data-id="'+p.id+'">تعديل</button>'
+      + '<button class="ft-btn danger" id="deletePersonBtn" data-id="'+p.id+'">🗑 حذف</button>'
+      + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+
+function computeStats(){
+  const list = Object.values(state.people);
+  const total = list.length;
+  const males = list.filter(p=>p.gender==='m').length;
+  const females = list.filter(p=>p.gender==='f').length;
+  const deceased = list.filter(p=>p.deceased || (p.deathYear && String(p.deathYear).trim())).length;
+  const alive = total - deceased;
+  const byGen = {};
+  const effectiveGen = computeEffectiveGen(state.people);
+  list.forEach(p=>{ const g = Math.max(effectiveGen[p.id]||1,1); byGen[g] = (byGen[g]||0)+1; });
+  const genRows = Object.keys(byGen).map(Number).sort((a,b)=>a-b).map(g=>({gen:g,count:byGen[g]}));
+  const nameCounts = {};
+  function normalizeNameKey(s){
+    return (s||"")
+      .replace(/[\u200B-\u200F\u202A-\u202E\uFEFF]/g, "") // zero-width / RTL-LTR marks / BOM
+      .replace(/[\u064B-\u065F\u0670]/g, "") // Arabic diacritics (tashkeel)
+      .replace(/ـ/g, "") // tatweel/kashida
+      .trim();
+  }
+  list.forEach(p=>{
+    const first = normalizeNameKey((p.name||"").trim().split(/\s+/)[0]);
+    if (first) nameCounts[first] = (nameCounts[first]||0)+1;
+  });
+  const topNames = Object.entries(nameCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  return {total, males, females, deceased, alive, genRows, topNames};
+}
+
+function findCommonAncestor(idA, idB){
+  if (!idA || !idB || !state.people[idA] || !state.people[idB]) return null;
+  const chainA = []; { let cur = state.people[idA], guard=0; while (cur && guard<100){ chainA.push(cur.id); cur = cur.parentId ? state.people[cur.parentId] : null; guard++; } }
+  const chainB = []; { let cur = state.people[idB], guard=0; while (cur && guard<100){ chainB.push(cur.id); cur = cur.parentId ? state.people[cur.parentId] : null; guard++; } }
+  const setA = new Map(chainA.map((id,i)=>[id,i]));
+  for (let j=0; j<chainB.length; j++){
+    if (setA.has(chainB[j])) return {ancestorId: chainB[j], distA: setA.get(chainB[j]), distB: j};
+  }
+  return null;
+}
+function renderKinshipModal(){
+  const people = Object.values(state.people).sort((a,b)=>a.name.localeCompare(b.name,'ar'));
+  const options = '<option value="">اختر شخصاً...</option>' + people.map(p=>'<option value="'+p.id+'"'+(state.kinshipA===p.id||state.kinshipB===p.id?'':'')+'>'+esc(p.name)+'</option>').join('');
+  let result = '';
+  if (state.kinshipA && state.kinshipB){
+    if (state.kinshipA === state.kinshipB){
+      result = '<div style="margin-top:16px;color:var(--cream-dim);">اختر شخصين مختلفين.</div>';
+    } else {
+      const r = findCommonAncestor(state.kinshipA, state.kinshipB);
+      const nameA = esc(state.people[state.kinshipA].name), nameB = esc(state.people[state.kinshipB].name);
+      if (!r){
+        result = '<div style="margin-top:16px;color:var(--cream-dim);">لا يوجد جد مشترك مسجّل بينهما بالشجرة.</div>';
+      } else if (r.distA===0 || r.distB===0){
+        const parentName = r.distA===0 ? nameA : nameB, childName = r.distA===0 ? nameB : nameA, dist = Math.max(r.distA,r.distB);
+        result = '<div class="detail-rel" style="margin-top:16px;">'
+          + '<div><b>'+parentName+'</b> هو سلف مباشر لـ<b>'+childName+'</b> (يفصل بينهما '+dist+' '+(dist===1?'جيل':'أجيال')+').</div></div>';
+      } else {
+        const ancestorName = esc(state.people[r.ancestorId].name);
+        result = '<div class="detail-rel" style="margin-top:16px;">'
+          + '<div>الجد المشترك: <b>'+ancestorName+'</b></div>'
+          + '<div style="margin-top:6px;">'+nameA+' يبعد عنه <b>'+r.distA+'</b> '+(r.distA===1?'جيل':'أجيال')+'</div>'
+          + '<div>'+nameB+' يبعد عنه <b>'+r.distB+'</b> '+(r.distB===1?'جيل':'أجيال')+'</div>'
+          + (r.distA===1 && r.distB===1 ? '<div style="margin-top:8px;color:var(--gold-light);">(إخوة/أخوات من نفس الأب)</div>' : '')
+          + '</div>';
+      }
+    }
+  }
+  return '<div class="overlay" id="kinshipOverlay"><div class="modal" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeKinshipBtn">✕</button>'
+    + '<div class="detail-name" style="margin-bottom:18px;">🔗 القرابة بين شخصين</div>'
+    + '<div class="ft-field"><label>الشخص الأول</label><select id="kinshipASelect">'+options.replace('value="'+state.kinshipA+'"','value="'+state.kinshipA+'" selected')+'</select></div>'
+    + '<div class="ft-field"><label>الشخص الثاني</label><select id="kinshipBSelect">'+options.replace('value="'+state.kinshipB+'"','value="'+state.kinshipB+'" selected')+'</select></div>'
+    + result + '</div></div>';
+}
+function renderStatsModal(){
+  const s = computeStats();
+  let html = '<div class="overlay" id="statsOverlay"><div class="modal" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeStatsBtn">✕</button>'
+    + '<div class="detail-name" style="margin-bottom:18px;">📊 إحصائيات الشجرة</div>';
+  if (s.total === 0){
+    html += '<div style="text-align:center;color:var(--cream-dim);">لا يوجد أفراد بعد.</div>';
+  } else {
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">'
+      + statCard('👥 إجمالي الأفراد', s.total)
+      + statCard('🧑 الذكور', s.males)
+      + statCard('👩 الإناث', s.females)
+      + statCard('💚 الأحياء', s.alive)
+      + statCard('🕊 المتوفّون', s.deceased)
+      + statCard('🌳 عدد الأجيال', s.genRows.length)
+      + '</div>';
+
+    html += '<div style="font-weight:700;color:var(--gold-light);margin:14px 0 8px;font-size:14px;">عدد الأفراد في كل جيل</div>';
+    html += '<div style="font-size:13px;">';
+    s.genRows.forEach(r => {
+      const pct = Math.round((r.count/s.total)*100);
+      html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+        + '<div style="width:90px;flex-shrink:0;color:var(--cream-dim);">'+esc(genLabel(r.gen))+'</div>'
+        + '<div style="flex:1;background:var(--bg-2);border-radius:6px;overflow:hidden;height:16px;">'
+        + '<div style="width:'+pct+'%;background:var(--gold);height:100%;"></div></div>'
+        + '<div style="width:28px;text-align:left;">'+r.count+'</div></div>';
+    });
+    html += '</div>';
+
+    if (s.topNames.length){
+      html += '<div style="font-weight:700;color:var(--gold-light);margin:18px 0 8px;font-size:14px;">الأسماء الأكثر تكراراً</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+      s.topNames.forEach(([name,count]) => {
+        html += '<div style="background:var(--panel-2);border:1px solid rgba(201,161,90,0.3);border-radius:999px;padding:4px 12px;font-size:12.5px;">'
+          + esc(name)+' <b style="color:var(--gold-light);">'+count+'</b></div>';
+      });
+      html += '</div>';
+    }
+  }
+  html += '</div></div>';
+  return html;
+}
+function statCard(label, value){
+  return '<div style="background:var(--bg-2);border:1px solid rgba(201,161,90,0.25);border-radius:12px;padding:12px;text-align:center;">'
+    + '<div style="font-size:22px;font-weight:700;color:var(--gold-light);">'+value+'</div>'
+    + '<div style="font-size:11.5px;color:var(--cream-dim);margin-top:2px;">'+label+'</div></div>';
+}
+
+function renderFamilyNameModal(){
+  return '<div class="overlay" id="familyNameOverlay"><div class="modal" style="max-width:360px;" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeFamilyNameBtn">✕</button>'
+    + '<div class="detail-name" style="margin-bottom:6px;">🖋 اسم العائلة</div>'
+    + '<p style="color:var(--cream-dim);font-size:13px;text-align:center;margin-bottom:16px;">يظهر في عنوان الصفحة للجميع، مثال: الحربي، آل سعود، العتيبي...</p>'
+    + field("familyNameInput","اسم العائلة","text","مثال: الحربي",state.familyName)
+    + errBlock()
+    + '<button class="ft-btn" id="saveFamilyNameBtn" style="width:100%;justify-content:center;" '+(state.busy?'disabled':'')+'>'+(state.busy?'جارٍ الحفظ...':'حفظ')+'</button>'
+    + '</div></div>';
+}
+
+function renderChangePwModal(){
+  let html = '<div class="overlay" id="changePwOverlay"><div class="modal" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeChangePwBtn">✕</button>'
+    + '<div class="detail-name" style="margin-bottom:6px;">🔑 تغيير كلمات المرور</div>'
+    + '<p style="color:var(--cream-dim);font-size:13px;text-align:center;margin-bottom:16px;">اختر ثلاث كلمات مرور جديدة. ستحتاج إخبار كل فئة بكلمتها الجديدة.</p>'
+    + '<div style="text-align:right;font-size:12.5px;color:var(--gold-light);font-weight:700;margin:10px 0 6px;">👑 المسؤول الأول</div>'
+    + field("cpAdminPw","كلمة مرور المسؤول الجديدة","password")
+    + field("cpAdminPw2","تأكيد كلمة مرور المسؤول","password")
+    + '<div style="text-align:right;font-size:12.5px;color:var(--gold-light);font-weight:700;margin:14px 0 6px;">✏️ المحرِّرون</div>'
+    + field("cpEditPw","كلمة مرور التعديل الجديدة","password")
+    + field("cpEditPw2","تأكيد كلمة مرور التعديل","password")
+    + '<div style="text-align:right;font-size:12.5px;color:var(--gold-light);font-weight:700;margin:14px 0 6px;">👁️ المشاهدون</div>'
+    + field("cpViewPw","كلمة مرور المشاهدة الجديدة","password")
+    + field("cpViewPw2","تأكيد كلمة مرور المشاهدة","password")
+    + errBlock()
+    + '<button class="ft-btn" id="saveChangePwBtn" style="width:100%;justify-content:center;" '+(state.busy?'disabled':'')+'>'+(state.busy?'جارٍ الحفظ...':'حفظ كلمات المرور الجديدة')+'</button>'
+    + '</div></div>';
+  return html;
+}
+
+function renderConfirmDelete(){
+  const p = state.people[state.confirmDeleteId];
+  return '<div class="overlay" id="confirmDeleteOverlay"><div class="modal" style="max-width:320px;text-align:center;" onclick="event.stopPropagation()">'
+    + '<div style="margin-bottom:16px;">هل أنت متأكد من حذف <b>'+esc(p?p.name:'')+'</b>؟ سيتم فصل الأبناء والزوج/الزوجة عن هذا الفرد.</div>'
+    + '<div class="modal-actions"><button class="ft-btn danger" id="confirmDeleteYes">حذف</button><button class="ft-btn secondary" id="confirmDeleteNo">إلغاء</button></div>'
+    + '</div></div>';
+}
+
+function renderConfirmImport(){
+  const count = state._pendingImport ? Object.keys(state._pendingImport.people||{}).length : 0;
+  return '<div class="overlay" id="confirmImportOverlay"><div class="modal" style="max-width:340px;text-align:center;" onclick="event.stopPropagation()">'
+    + '<div style="margin-bottom:16px;">⚠️ هذا سيستبدل <b>جميع</b> بيانات الشجرة الحالية بمحتوى الملف ('+count+' فرداً). لا يمكن التراجع بعد التأكيد.</div>'
+    + '<div class="modal-actions"><button class="ft-btn danger" id="confirmImportYes">استيراد واستبدال</button><button class="ft-btn secondary" id="confirmImportNo">إلغاء</button></div>'
+    + '</div></div>';
+}
+
+function renderExportModal(){
+  return '<div class="overlay" id="exportOverlay"><div class="modal" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeExportBtn">✕</button>'
+    + '<div class="detail-name" style="margin-bottom:6px;">💾 نسخة احتياطية</div>'
+    + '<p style="color:var(--cream-dim);font-size:13px;text-align:center;margin-bottom:14px;">اضغط "نسخ إلى الحافظة"، ثم الصقه في إيميل ترسله لنفسك أو في تطبيق الملاحظات واحفظه. هذا أضمن طريقة تتجنب مشاكل تنزيل الملفات.</p>'
+    + '<button class="ft-btn" id="copyExportBtn" style="width:100%;justify-content:center;margin-bottom:10px;">'+(state.copiedFlag?'✅ تم النسخ':'📋 نسخ إلى الحافظة')+'</button>'
+    + '<textarea id="exportTextarea" readonly dir="ltr" style="width:100%;height:160px;background:var(--bg-2);border:1px solid rgba(201,161,90,0.3);border-radius:8px;padding:10px;color:var(--cream);font-family:monospace;font-size:11px;">'+esc(state.exportJson)+'</textarea>'
+    + '<p style="color:var(--cream-dim);font-size:11.5px;text-align:center;margin-top:8px;">إذا ما اشتغل زر النسخ، اضغط مطولاً داخل الصندوق فوق واختر "تحديد الكل" ثم "نسخ".</p>'
+    + '</div></div>';
+}
+
+function renderImportPasteModal(){
+  return '<div class="overlay" id="importPasteOverlay"><div class="modal" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeImportPasteBtn">✕</button>'
+    + '<div class="detail-name" style="margin-bottom:6px;">📋 استيراد بلصق نص</div>'
+    + '<p style="color:var(--cream-dim);font-size:13px;text-align:center;margin-bottom:14px;">افتح الملاحظة أو الإيميل اللي فيه النسخة الاحتياطية، انسخ النص كامل، ثم اضغط داخل الصندوق تحت والصقه.</p>'
+    + '<textarea id="importPasteTextarea" dir="ltr" placeholder="الصق نص النسخة الاحتياطية هنا..." style="width:100%;height:160px;background:var(--bg-2);border:1px solid rgba(201,161,90,0.3);border-radius:8px;padding:10px;color:var(--cream);font-family:monospace;font-size:11px;"></textarea>'
+    + errBlock()
+    + '<button class="ft-btn" id="importPasteContinueBtn" style="width:100%;justify-content:center;margin-top:12px;">متابعة</button>'
+    + '</div></div>';
+}
+
+function renderEditModal(){
+  const isChild = typeof state.editId === "string" && state.editId.startsWith("new-child-");
+  const presetParentId = isChild ? state.editId.replace("new-child-","") : null;
+  const isNew = state.editId === "new" || isChild;
+  const existing = !isNew ? state.people[state.editId] : null;
+  const presetParent = presetParentId ? state.people[presetParentId] : null;
+  const f = state._editForm || {
+    name: existing?.name || "", gender: existing?.gender || "m",
+    gen: existing?.gen || (presetParent ? presetParent.gen+1 : 1),
+    parentId: existing?.parentId || presetParentId || "",
+    motherName: existing?.motherName || "",
+    husbandName: existing?.husbandName || (existing?.gender==='f' ? (existing?.spouseName||"") : ""),
+    wifeName: existing?.wifeName || (existing?.gender==='m' ? (existing?.spouseName||"") : ""),
+    birthYear: existing?.birthYear || "",
+    deathYear: existing?.deathYear || "", bio: existing?.bio || "",
+    deceased: existing?.deceased || false,
+    photos: existing?.photos ? [...existing.photos] : (existing?.photo ? [existing.photo] : []),
+    siblingPosition: null,
+  };
+  state._editForm = f;
+  const others = Object.values(state.people).filter(p=>p.id !== state.editId);
+  const currentParentId = f.parentId || presetParentId || "";
+  const siblingsExcludingSelf = siblingsUnder(state.people, currentParentId, existing ? existing.id : null);
+  let defaultSiblingPos = siblingsExcludingSelf.length; // default: place after everyone (matches old append-to-end behavior)
+  if (existing){
+    const allSiblingsIncludingSelf = siblingsUnder(state.people, currentParentId, null);
+    const idx = allSiblingsIncludingSelf.findIndex(p=>p.id===existing.id);
+    if (idx !== -1) defaultSiblingPos = idx;
+  }
+  const selectedSiblingPos = (f.siblingPosition !== null && f.siblingPosition !== undefined) ? Number(f.siblingPosition) : defaultSiblingPos;
+  let siblingPosOptions = '<option value="0"'+(selectedSiblingPos===0?' selected':'')+'>🔝 الأول (قبل الجميع)</option>';
+  siblingsExcludingSelf.forEach((s,i) => {
+    siblingPosOptions += '<option value="'+(i+1)+'"'+(selectedSiblingPos===i+1?' selected':'')+'>بعد "'+esc(s.name)+'"</option>';
+  });
+  let html = '<div class="overlay" id="editOverlay"><div class="modal" onclick="event.stopPropagation()">'
+    + '<button class="modal-close" id="closeEditBtn">✕</button>'
+    + '<div class="detail-name" style="margin-bottom:16px;">'+(existing?'تعديل بيانات الفرد':'إضافة فرد جديد')+'</div>'
+    + '<div class="ft-field"><label>الاسم الكامل *</label><input id="f_name" dir="rtl" value="'+esc(f.name)+'" placeholder="مثال: أحمد بن محمد"></div>'
+    + '<div class="ft-row2"><div class="ft-field"><label>الجنس</label><select id="f_gender"><option value="m" '+(f.gender==='m'?'selected':'')+'>ذكر</option><option value="f" '+(f.gender==='f'?'selected':'')+'>أنثى</option></select></div>'
+    + '<div class="ft-field"><label>الجيل</label><input type="number" min="1" id="f_gen" value="'+f.gen+'"></div></div>'
+    + '<div class="ft-field"><label>الأب</label><select id="f_parent"><option value="">— بدون —</option>'
+    + others.map(p=>'<option value="'+p.id+'" '+(f.parentId===p.id?'selected':'')+'>'+esc(p.name)+'</option>').join('')
+    + '</select></div>'
+    + '<div class="ft-field"><label>الترتيب بين الإخوة</label><select id="f_siblingPosition">'+siblingPosOptions+'</select></div>'
+    + '<div class="ft-field"><label>الأم</label><input id="f_motherName" dir="rtl" value="'+esc(f.motherName)+'" placeholder="اكتب الاسم (اختياري)"></div>'
+    + '<div class="ft-field"><label>الزوج</label><input id="f_husbandName" dir="rtl" value="'+esc(f.husbandName)+'" placeholder="اكتب الاسم (اختياري)"></div>'
+    + '<div class="ft-field"><label>الزوجة</label><input id="f_wifeName" dir="rtl" value="'+esc(f.wifeName)+'" placeholder="اكتب الاسم (اختياري)"></div>'
+    + '<div class="ft-row2"><div class="ft-field"><label>سنة الميلاد</label><input id="f_birth" value="'+esc(f.birthYear)+'" placeholder="مثال: 1950"></div>'
+    + '<div class="ft-field"><label>سنة الوفاة (اختياري)</label><input id="f_death" value="'+esc(f.deathYear)+'"></div></div>'
+    + '<label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cream-dim);margin:0 0 14px;text-align:right;justify-content:flex-end;">'
+    + '<input type="checkbox" id="f_deceased" '+(f.deceased?'checked':'')+'> متوفى (حتى بدون تحديد سنة الوفاة)</label>'
+    + '<div class="ft-field"><label>نبذة</label><textarea id="f_bio" dir="rtl">'+esc(f.bio)+'</textarea></div>'
+    + '<div class="ft-field"><label>الصور (يمكن إضافة أكثر من صورة)</label>'
+    + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">'
+    + f.photos.map((ph,i)=>'<div style="position:relative;"><img src="'+ph+'" style="width:60px;height:60px;border-radius:8px;object-fit:cover;border:1.5px solid rgba(201,161,90,0.4);">'
+      + '<button class="remove-photo-btn" data-idx="'+i+'" style="position:absolute;top:-6px;left:-6px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:12px;cursor:pointer;">✕</button></div>').join('')
+    + '</div>'
+    + '<label class="photo-btn">📷 إضافة صورة<input type="file" accept="image/*" id="f_photo" style="display:none;"></label></div>'
+    + errBlock()
+    + '<div class="modal-actions"><button class="ft-btn" id="saveEditBtn" '+(state.busy?'disabled':'')+'>'+(state.busy?'جارٍ الحفظ...':'حفظ')+'</button><button class="ft-btn secondary" id="cancelEditBtn" '+(state.busy?'disabled':'')+'>إلغاء</button></div>'
+    + '</div></div>';
+  return html;
+}
+
+function wireAppEvents(layout){
+  // Fix iOS Safari bug: RTL text inputs don't auto-scroll to keep the caret visible while typing.
+  document.querySelectorAll('.ft-field input[dir="rtl"], .ft-field textarea[dir="rtl"], .search input[dir="rtl"]').forEach(el => {
+    el.addEventListener('input', () => {
+      requestAnimationFrame(() => { el.scrollLeft = -el.scrollWidth; });
+    });
+  });
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) searchInput.oninput = e => {
+    const cursorPos = e.target.selectionStart;
+    state.search = e.target.value;
+    state.highlightGen = null;
+    renderApp();
+    const newInput = document.getElementById("searchInput");
+    if (newInput) { newInput.focus(); newInput.setSelectionRange(cursorPos, cursorPos); }
+    const term = state.search.trim();
+    if (term){
+      const searchLayout = computeLayout(state.people);
+      const matches = Object.values(state.people).filter(p => p.name && p.name.includes(term));
+      if (matches.length){
+        matches.sort((a,b) => (searchLayout.positions[a.id]?.gen||1) - (searchLayout.positions[b.id]?.gen||1));
+        scrollToPerson(matches[0].id);
+      }
+    }
+  };
+  document.getElementById("logoutBtn").onclick = () => { if(pollTimer) clearInterval(pollTimer); forgetSession(); state.session=null; state.mode="login"; state.people={}; render(); };
+  document.getElementById("syncNowBtn").onclick = () => loadPeople();
+  const menuToggleBtn = document.getElementById("menuToggleBtn");
+  if (menuToggleBtn) menuToggleBtn.onclick = (e) => {
+    e.stopPropagation();
+    state.menuOpen = !state.menuOpen;
+    renderApp();
+  };
+  document.querySelectorAll(".legend button").forEach(b => b.onclick = () => {
+    const g = parseInt(b.dataset.gen);
+    state.search = "";
+    state.highlightGen = g;
+    renderApp();
+    const genLayout = computeLayout(state.people);
+    const inGen = Object.values(state.people).filter(p => (genLayout.positions[p.id]?.gen||1) === g);
+    if (inGen.length){
+      inGen.sort((a,b2) => (genLayout.positions[a.id]?.x||0) - (genLayout.positions[b2.id]?.x||0));
+      scrollToPerson(inGen[0].id);
+    }
+  });
+  const showStatsBtn = document.getElementById("showStatsBtn");
+  if (showStatsBtn) showStatsBtn.onclick = () => { state.showStats = true; render(); };
+  const statsOverlay = document.getElementById("statsOverlay");
+  if (statsOverlay){
+    statsOverlay.onclick = () => { state.showStats=false; render(); };
+    document.getElementById("closeStatsBtn").onclick = () => { state.showStats=false; render(); };
+  }
+  const showKinshipBtn = document.getElementById("showKinshipBtn");
+  if (showKinshipBtn) showKinshipBtn.onclick = () => {
+    state.kinshipMode = "picking"; state.kinshipPickA = null; state.kinshipPickB = null; renderApp();
+  };
+  const kinshipCancelBtn = document.getElementById("kinshipCancelBtn");
+  if (kinshipCancelBtn) kinshipCancelBtn.onclick = (e) => {
+    e.stopPropagation();
+    state.kinshipMode = null; state.kinshipPickA = null; state.kinshipPickB = null; renderApp();
+  };
+  const kinshipOverlay = document.getElementById("kinshipOverlay");
+  if (kinshipOverlay){
+    kinshipOverlay.onclick = () => { state.showKinship=false; state.kinshipA=""; state.kinshipB=""; render(); };
+    document.getElementById("closeKinshipBtn").onclick = () => { state.showKinship=false; state.kinshipA=""; state.kinshipB=""; render(); };
+    document.getElementById("kinshipASelect").onchange = e => { state.kinshipA = e.target.value; render(); };
+    document.getElementById("kinshipBSelect").onchange = e => { state.kinshipB = e.target.value; render(); };
+  }
+
+  const editFamilyNameBtn = document.getElementById("editFamilyNameBtn");
+  if (editFamilyNameBtn) editFamilyNameBtn.onclick = () => { state.showFamilyName = true; state.err=""; render(); };
+  const familyNameOverlay = document.getElementById("familyNameOverlay");
+  if (familyNameOverlay){
+    familyNameOverlay.onclick = () => { state.showFamilyName=false; state.err=""; render(); };
+    document.getElementById("closeFamilyNameBtn").onclick = () => { state.showFamilyName=false; state.err=""; render(); };
+    document.getElementById("saveFamilyNameBtn").onclick = async () => {
+      const name = val("familyNameInput").trim();
+      state.err = ""; state.busy = true; render();
+      try {
+        const meta = await loadMeta();
+        const familyNameEnc = await encryptText(state.session.cryptoKey, name);
+        const cleanMeta = {...meta}; delete cleanMeta.familyName;
+        await saveMeta({...cleanMeta, familyNameEnc});
+        state.familyName = name;
+        if (name) updateAppTitle(name);
+        state.showFamilyName = false;
+      } catch(e){ state.err = "تعذّر حفظ اسم العائلة."; }
+      state.busy = false; render();
+    };
+  }
+
+  const changePwBtn = document.getElementById("changePwBtn");
+  if (changePwBtn) changePwBtn.onclick = () => { state.showChangePw = true; state.err=""; render(); };
+
+  const exportDataBtn = document.getElementById("exportDataBtn");
+  if (exportDataBtn) exportDataBtn.onclick = () => {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      treeId: TREE_ID,
+      familyName: state.familyName || "",
+      people: state.people,
+    };
+    state.exportJson = JSON.stringify(payload, null, 2);
+    state.copiedFlag = false;
+    state.showExportModal = true;
+    render();
+  };
+  const exportOverlay = document.getElementById("exportOverlay");
+  if (exportOverlay){
+    exportOverlay.onclick = () => { state.showExportModal=false; state.copiedFlag=false; render(); };
+    document.getElementById("closeExportBtn").onclick = () => { state.showExportModal=false; state.copiedFlag=false; render(); };
+    const copyBtn = document.getElementById("copyExportBtn");
+    if (copyBtn) copyBtn.onclick = async () => {
+      const ta = document.getElementById("exportTextarea");
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(state.exportJson);
+        } else if (ta) {
+          ta.focus(); ta.select(); document.execCommand("copy");
+        }
+        state.copiedFlag = true;
+      } catch(e){
+        if (ta){ ta.focus(); ta.select(); try { document.execCommand("copy"); state.copiedFlag = true; } catch(_) {} }
+      }
+      renderApp();
+      setTimeout(() => { state.copiedFlag = false; if (state.showExportModal) renderApp(); }, 3000);
+    };
+  }
+  const importDataBtn = document.getElementById("importDataBtn");
+  const importDataInput = document.getElementById("importDataInput");
+  if (importDataBtn && importDataInput){
+    importDataBtn.onclick = () => importDataInput.click();
+    importDataInput.onchange = async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      try {
+        const text = await file.text();
+        const parsed = JSON.parse(text);
+        if (!parsed || typeof parsed.people !== "object"){ state.err = "ملف غير صالح."; render(); }
+        else { state._pendingImport = parsed; state.confirmImport = true; state.err=""; render(); }
+      } catch(err){ state.err = "تعذّر قراءة الملف."; render(); }
+      importDataInput.value = "";
+    };
+  }
+  const importPasteBtn = document.getElementById("importPasteBtn");
+  if (importPasteBtn) importPasteBtn.onclick = () => { state.showImportPasteModal = true; state.err=""; render(); };
+  const importPasteOverlay = document.getElementById("importPasteOverlay");
+  if (importPasteOverlay){
+    importPasteOverlay.onclick = () => { state.showImportPasteModal=false; state.err=""; render(); };
+    document.getElementById("closeImportPasteBtn").onclick = () => { state.showImportPasteModal=false; state.err=""; render(); };
+    document.getElementById("importPasteContinueBtn").onclick = () => {
+      const text = val("importPasteTextarea");
+      if (!text.trim()){ state.err = "الصق النص أولاً."; render(); return; }
+      try {
+        const parsed = JSON.parse(text);
+        if (!parsed || typeof parsed.people !== "object"){ state.err = "النص غير صالح — تأكد إنك نسخت النسخة الاحتياطية كاملة."; render(); return; }
+        state._pendingImport = parsed; state.confirmImport = true; state.showImportPasteModal = false; state.err="";
+        render();
+      } catch(err){ state.err = "تعذّر قراءة النص — تأكد إنه منسوخ كامل وبدون تعديل."; render(); }
+    };
+  }
+  const confirmImportOverlay = document.getElementById("confirmImportOverlay");
+  if (confirmImportOverlay){
+    confirmImportOverlay.onclick = () => { state.confirmImport=false; state._pendingImport=null; render(); };
+    document.getElementById("confirmImportNo").onclick = () => { state.confirmImport=false; state._pendingImport=null; render(); };
+    document.getElementById("confirmImportYes").onclick = async () => {
+      const data = state._pendingImport;
+      state.confirmImport = false; state.busy = true; state.err=""; render();
+      try {
+        await fbDelete(PATH_PREFIX+"persons");
+        const entries = Object.values(data.people||{});
+        for (const p of entries){
+          if (!p.id) continue;
+          const cipher = await encryptText(state.session.cryptoKey, JSON.stringify(p));
+          await fbSet(PATH_PREFIX+"persons/"+p.id, cipher);
+        }
+        if (data.familyName){
+          const meta = await loadMeta();
+          const familyNameEnc = await encryptText(state.session.cryptoKey, data.familyName);
+          const cleanMeta = {...meta}; delete cleanMeta.familyName;
+          await saveMeta({...cleanMeta, familyNameEnc});
+          state.familyName = data.familyName;
+          updateAppTitle(data.familyName);
+        }
+        await loadPeople();
+      } catch(e){ state.err = "تعذّر إتمام الاستيراد."; }
+      state._pendingImport = null; state.busy = false; render();
+    };
+  }
+  const changePwOverlay = document.getElementById("changePwOverlay");
+  if (changePwOverlay){
+    changePwOverlay.onclick = () => { state.showChangePw=false; state.err=""; render(); };
+    document.getElementById("closeChangePwBtn").onclick = () => { state.showChangePw=false; state.err=""; render(); };
+    document.getElementById("saveChangePwBtn").onclick = async () => {
+      state.err = "";
+      const adminPw=val("cpAdminPw"), adminPw2=val("cpAdminPw2"), editPw=val("cpEditPw"), editPw2=val("cpEditPw2"), viewPw=val("cpViewPw"), viewPw2=val("cpViewPw2");
+      if (adminPw.length<6){ state.err="كلمة مرور المسؤول 6 أحرف على الأقل."; render(); return; }
+      if (adminPw!==adminPw2){ state.err="كلمتا مرور المسؤول غير متطابقتين."; render(); return; }
+      if (editPw.length<6){ state.err="كلمة مرور التعديل 6 أحرف على الأقل."; render(); return; }
+      if (editPw!==editPw2){ state.err="كلمتا مرور التعديل غير متطابقتين."; render(); return; }
+      if (viewPw.length<6){ state.err="كلمة مرور المشاهدة 6 أحرف على الأقل."; render(); return; }
+      if (viewPw!==viewPw2){ state.err="كلمتا مرور المشاهدة غير متطابقتين."; render(); return; }
+      const set = new Set([adminPw,editPw,viewPw]);
+      if (set.size < 3){ state.err="اجعل الكلمات الثلاث مختلفة عن بعضها."; render(); return; }
+      state.busy = true; render();
+      try {
+        const rec = await loadAuthRecord();
+        const adminWrap = await wrapDataKeyFor(adminPw, state.session.rawKeyB64);
+        const editWrap = await wrapDataKeyFor(editPw, state.session.rawKeyB64);
+        const viewWrap = await wrapDataKeyFor(viewPw, state.session.rawKeyB64);
+        await saveAuthRecord({
+          ...rec,
+          adminSalt:adminWrap.salt, adminWrap:adminWrap.wrap,
+          editSalt:editWrap.salt, editWrap:editWrap.wrap,
+          viewSalt:viewWrap.salt, viewWrap:viewWrap.wrap,
+        });
+        state.showChangePw = false;
+        state.err = "";
+      } catch(e){ state.err = "تعذّر حفظ كلمات المرور الجديدة."; }
+      state.busy = false; render();
+    };
+  }
+
+  const addBtn = document.getElementById("addPersonBtn");
+  if (addBtn) addBtn.onclick = () => { state.editId="new"; state._editForm=null; render(); };
+  const addFirstBtn = document.getElementById("addFirstBtn");
+  if (addFirstBtn) addFirstBtn.onclick = () => { state.editId="new"; state._editForm=null; render(); };
+  const zi = document.getElementById("zoomInBtn"); if (zi) zi.onclick = () => applyZoomFactor(1.2);
+  const zo = document.getElementById("zoomOutBtn"); if (zo) zo.onclick = () => applyZoomFactor(1/1.2);
+
+  document.querySelectorAll(".node").forEach(n => n.onclick = (e) => {
+    if (state.kinshipMode){
+      e.stopPropagation();
+      const id = n.dataset.id;
+      if (!state.kinshipPickA){ state.kinshipPickA = id; }
+      else if (!state.kinshipPickB && id !== state.kinshipPickA){ state.kinshipPickB = id; state.kinshipMode = "result"; }
+      else { state.kinshipPickA = id; state.kinshipPickB = null; state.kinshipMode = "picking"; }
+      renderApp();
+      return;
+    }
+    state.detailId = n.dataset.id; render();
+  });
+
+  const detailOverlay = document.getElementById("detailOverlay");
+  if (detailOverlay){
+    detailOverlay.onclick = () => { state.detailId=null; render(); };
+    document.getElementById("closeDetailBtn").onclick = () => { state.detailId=null; render(); };
+    const addChildBtn = document.getElementById("addChildBtn");
+    if (addChildBtn) addChildBtn.onclick = () => { state.editId = "new-child-"+addChildBtn.dataset.id; state._editForm=null; render(); };
+    const editBtn = document.getElementById("editPersonBtn");
+    if (editBtn) editBtn.onclick = () => { state.editId = editBtn.dataset.id; state._editForm=null; render(); };
+    const delBtn = document.getElementById("deletePersonBtn");
+    if (delBtn) delBtn.onclick = () => { state.confirmDeleteId = delBtn.dataset.id; render(); };
+    document.querySelectorAll(".gallery-thumb").forEach(t => t.onclick = (e) => {
+      e.stopPropagation();
+      const avatar = document.querySelector(".detail-avatar");
+      if (avatar) avatar.innerHTML = '<img src="'+t.src+'">';
+    });
+  }
+
+  const confirmOverlay = document.getElementById("confirmDeleteOverlay");
+  if (confirmOverlay){
+    confirmOverlay.onclick = () => { state.confirmDeleteId=null; render(); };
+    document.getElementById("confirmDeleteYes").onclick = () => deletePersonCloud(state.confirmDeleteId);
+    document.getElementById("confirmDeleteNo").onclick = () => { state.confirmDeleteId=null; render(); };
+  }
+
+  const editOverlay = document.getElementById("editOverlay");
+  if (editOverlay){
+    editOverlay.onclick = () => { state.editId=null; state.err=""; render(); };
+    document.getElementById("closeEditBtn").onclick = () => { state.editId=null; state.err=""; render(); };
+    document.getElementById("cancelEditBtn").onclick = () => { state.editId=null; state.err=""; render(); };
+    const grab = () => {
+      state._editForm = {
+        name: val("f_name"), gender: val("f_gender"), gen: val("f_gen"),
+        parentId: val("f_parent"), motherName: val("f_motherName"),
+        husbandName: val("f_husbandName"), wifeName: val("f_wifeName"),
+        birthYear: val("f_birth"), deathYear: val("f_death"), bio: val("f_bio"),
+        deceased: document.getElementById("f_deceased") ? document.getElementById("f_deceased").checked : (state._editForm ? !!state._editForm.deceased : false),
+        siblingPosition: document.getElementById("f_siblingPosition") ? document.getElementById("f_siblingPosition").value : (state._editForm ? state._editForm.siblingPosition : null),
+        photos: state._editForm ? state._editForm.photos : [],
+      };
+    };
+    const parentSelect = document.getElementById("f_parent");
+    if (parentSelect) parentSelect.onchange = () => {
+      grab();
+      state._editForm.siblingPosition = null; // parent changed, recompute default position among new siblings
+      render();
+    };
+    const photoInput = document.getElementById("f_photo");
+    if (photoInput) photoInput.onchange = async (e) => {
+      const file = e.target.files[0]; if (!file) return;
+      grab();
+      try { state._editForm.photos.push(await compressImage(file)); } catch(_) {}
+      render();
+    };
+    document.querySelectorAll(".remove-photo-btn").forEach(btn => btn.onclick = () => {
+      grab();
+      state._editForm.photos.splice(parseInt(btn.dataset.idx), 1);
+      render();
+    });
+    document.getElementById("saveEditBtn").onclick = async () => {
+      if (state.busy) return;
+      grab();
+      if (!state._editForm.name.trim()){ state.err="الاسم مطلوب."; render(); return; }
+      const existing = (state.editId!=="new" && !state.editId.startsWith("new-child-")) ? state.people[state.editId] : null;
+      const person = {
+        id: existing ? existing.id : uid(),
+        name: state._editForm.name.trim(), gender: state._editForm.gender,
+        gen: Math.max(1, Math.round(Number(state._editForm.gen))||1),
+        parentId: state._editForm.parentId || null, motherName: state._editForm.motherName||"",
+        husbandName: state._editForm.husbandName||"", wifeName: state._editForm.wifeName||"",
+        birthYear: state._editForm.birthYear||"", deathYear: state._editForm.deathYear||"",
+        deceased: !!(state._editForm.deceased || (state._editForm.deathYear && String(state._editForm.deathYear).trim())),
+        bio: state._editForm.bio||"", photos: state._editForm.photos||[],
+        createdAt: existing?.createdAt || Date.now(),
+      };
+      // Apply chosen sibling position: recompute sequential order values for this person and all its siblings.
+      const chosenPos = Math.max(0, parseInt(state._editForm.siblingPosition, 10) || 0);
+      const siblingsList = siblingsUnder(state.people, person.parentId, person.id);
+      const insertPos = Math.min(chosenPos, siblingsList.length);
+      const orderedWithSelf = [...siblingsList];
+      orderedWithSelf.splice(insertPos, 0, person);
+      const renumbered = orderedWithSelf.map((p,i) => ({id:p.id, order:i}));
+      person.order = renumbered.find(r=>r.id===person.id).order;
+      state.busy = true; state.err=""; render();
+      for (const r of renumbered){
+        if (r.id === person.id) continue;
+        const sib = state.people[r.id];
+        if (sib && sib.order !== r.order){
+          await savePersonCloud({...sib, order: r.order});
+        }
+      }
+      await savePersonCloud(person);
+      state.busy = false; state.editId = null; state._editForm=null; state.detailId=person.id; state.err="";
+      render();
+      scrollToPerson(person.id);
+    };
+  }
+
+  // Pinch / pan
+  const wrap = document.getElementById("canvasWrap");
+  if (wrap){
+    let pinch = {active:false,startDist:0,startZoom:1,midX:0,midY:0};
+    let pan = {active:false,lastX:0,lastY:0,startX:0,startY:0,moved:false};
+    let suppressClick = false;
+    const dist = (a,b) => Math.hypot(a.clientX-b.clientX, a.clientY-b.clientY);
+    const mid = (a,b) => ({x:(a.clientX+b.clientX)/2, y:(a.clientY+b.clientY)/2});
+    wrap.addEventListener("touchstart", e => {
+      gestureActive = true;
+      if (e.touches.length===2){
+        const wrapRect = wrap.getBoundingClientRect();
+        const m = mid(e.touches[0],e.touches[1]);
+        pinch = {active:true, startDist:dist(e.touches[0],e.touches[1]), startZoom:state.zoom,
+                 midX:m.x-wrapRect.left, midY:m.y-wrapRect.top};
+        pan.active=false;
+      } else if (e.touches.length===1){
+        pan = {active:true, lastX:e.touches[0].clientX, lastY:e.touches[0].clientY,
+               startX:e.touches[0].clientX, startY:e.touches[0].clientY, moved:false};
+      }
+    });
+    wrap.addEventListener("touchmove", e => {
+      if (e.touches.length===2 && pinch.active){
+        e.preventDefault();
+        const wrapRect = wrap.getBoundingClientRect();
+        const m = mid(e.touches[0],e.touches[1]);
+        const midX = m.x-wrapRect.left, midY = m.y-wrapRect.top;
+        const d = dist(e.touches[0],e.touches[1]);
+        const newZoom = Math.min(1.6, Math.max(0.08, pinch.startZoom*(d/pinch.startDist)));
+        const oldZoom = state.zoom;
+        const contentX = (wrap.scrollLeft + midX) / oldZoom;
+        const contentY = (wrap.scrollTop + midY) / oldZoom;
+        state.zoom = newZoom;
+        const canvasEl = document.getElementById("canvas");
+        const sizerEl = document.getElementById("canvasSizer");
+        if (canvasEl) canvasEl.style.transform = "scale("+newZoom+")";
+        if (sizerEl){ sizerEl.style.width = (layout.width*newZoom)+"px"; sizerEl.style.height = (layout.height*newZoom)+"px"; }
+        wrap.scrollLeft = Math.max(0, contentX*newZoom - midX);
+        wrap.scrollTop = Math.max(0, contentY*newZoom - midY);
+      } else if (e.touches.length===1 && pan.active){
+        e.preventDefault();
+        const dx = e.touches[0].clientX-pan.lastX, dy = e.touches[0].clientY-pan.lastY;
+        wrap.scrollLeft -= dx*PAN_SPEED; wrap.scrollTop -= dy*PAN_SPEED;
+        pan.lastX=e.touches[0].clientX; pan.lastY=e.touches[0].clientY;
+        if (Math.hypot(e.touches[0].clientX-pan.startX, e.touches[0].clientY-pan.startY) > 8) pan.moved = true;
+      }
+    });
+    wrap.addEventListener("touchend", e => {
+      if (pan.active && pan.moved) { suppressClick = true; setTimeout(()=>{suppressClick=false;}, 300); }
+      if(e.touches.length<2 && pinch.active){ pinch.active=false; renderApp(); }
+      if(e.touches.length<1){ pan.active=false; gestureActive=false; }
+    });
+    wrap.addEventListener("click", e => {
+      if (suppressClick){ e.stopPropagation(); e.preventDefault(); suppressClick=false; }
+    }, true);
+
+    // Desktop mouse: wheel to zoom, click-and-drag to pan
+    wrap.addEventListener("wheel", e => {
+      e.preventDefault();
+      const wrapRect = wrap.getBoundingClientRect();
+      const ax = e.clientX - wrapRect.left, ay = e.clientY - wrapRect.top;
+      const oldZoom = state.zoom;
+      const newZoom = Math.min(1.6, Math.max(0.08, Math.round(oldZoom*(e.deltaY>0?1/1.08:1.08)*100)/100));
+      const contentX = (wrap.scrollLeft + ax) / oldZoom;
+      const contentY = (wrap.scrollTop + ay) / oldZoom;
+      state.zoom = newZoom;
+      renderApp();
+      const newWrap = document.getElementById("canvasWrap");
+      if (newWrap){
+        newWrap.scrollLeft = Math.max(0, contentX*newZoom - ax);
+        newWrap.scrollTop = Math.max(0, contentY*newZoom - ay);
+      }
+    }, {passive:false});
+    wrap.addEventListener("mousedown", e => {
+      if (e.target.closest(".node")) return;
+      gestureActive = true;
+      globalMouseDrag = {active:true, lastX:e.clientX, lastY:e.clientY, wrap};
+      wrap.style.cursor = "grabbing";
+    });
+    wrap.style.cursor = "grab";
+    wrap.addEventListener("click", e => {
+      if (state.kinshipMode && !e.target.closest(".node")){
+        state.kinshipMode = null; state.kinshipPickA = null; state.kinshipPickB = null;
+        renderApp();
+      }
+    });
+
+    // Auto-fit only on first load, never again afterward (so edits/additions don't reset the user's view)
+    requestAnimationFrame(() => {
+      const fitKey = layout.width+"x"+layout.height;
+      if (Object.keys(state.people).length>0 && state.lastFitKey === null){
+        state.lastFitKey = fitKey;
+        const ww = wrap.clientWidth||360, wh = wrap.clientHeight||500;
+        const fit = Math.min(ww/layout.width, wh/layout.height, 1);
+        state.zoom = Math.max(0.08, Math.round(fit*100)/100);
+        renderApp();
+      }
+    });
+  }
+  wirePasswordToggles();
+}
+
+// ---------- Boot ----------
+(async function boot(){
+  if (!window.crypto || !window.crypto.subtle){ state.mode="unsupported"; render(); return; }
+  try { const meta = await loadMeta(); state.familyName = meta.familyNameEnc ? "" : (meta.familyName || ""); if (state.familyName) updateAppTitle(state.familyName); } catch(_) {}
+  const rec = await loadAuthRecord();
+  if (rec){
+    const remembered = loadRememberedSession();
+    if (remembered && remembered.rawKeyB64){
+      try {
+        const cryptoKey = await importDataKey(remembered.rawKeyB64);
+        state.session = {role: remembered.role, cryptoKey, rawKeyB64: remembered.rawKeyB64};
+        state.mode = "app";
+        render();
+        await loadPeople();
+        startPolling();
+        return;
+      } catch(_) { forgetSession(); }
+    }
+  }
+  state.mode = rec ? "login" : "setup";
+  render();
+})();
+</script>
+</body>
+</html>
