@@ -191,6 +191,14 @@
   table.histtable tr.hist-paid td.hist-status{color:var(--green);}
   table.histtable tr.hist-unpaid td.hist-status{color:var(--red);}
   table.histtable tr.hist-upcoming td.hist-status{color:var(--muted);}
+  table.histtable td.hist-note{padding:4px 6px;}
+  table.histtable input.hist-note-input{
+    width:100%; min-width:110px; padding:6px 8px; font-size:12.5px;
+    border:1.5px solid var(--line); border-radius:6px; background:#FBFAF6;
+  }
+  table.histtable input.hist-note-input:focus{
+    outline:none; border-color:var(--gold-dark); box-shadow:0 0 0 2px rgba(201,162,39,0.2);
+  }
 
   /* Building groups */
   .building-group{margin-bottom: 26px;}
@@ -432,7 +440,7 @@
 
 <!-- Payment History Modal -->
 <div class="overlay" id="overlayHistory">
-  <div class="modal" style="max-width:560px;">
+  <div class="modal" style="max-width:620px;">
     <h3 id="historyTitle">سجل الدفعات</h3>
     <div id="historyContent" style="max-height:60vh; overflow-y:auto;"></div>
     <div class="modal-actions">
@@ -571,6 +579,15 @@ function fmtDate(dateStr){
   if(!dateStr) return '—';
   const d = new Date(dateStr + 'T00:00:00');
   return d.toLocaleDateString('ar-EG', {year:'numeric', month:'short', day:'numeric'});
+}
+/* تاريخ رقمي بالكامل (يوم/شهر/سنة) — يُستخدم في سجل الدفعات بناءً على طلب المستخدم */
+function fmtDateNum(dateStr){
+  if(!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
 }
 function fmtNum(n){
   return Number(n||0).toLocaleString('ar-EG');
@@ -909,7 +926,7 @@ document.getElementById('saveUnitBtn').onclick = async ()=>{
     const u = state.units.find(x=>x.id===id);
     Object.assign(u, {buildingId, unitNumber, tenantName, rentAmount, frequency, contractStart, contractEnd, waterAmount, insuranceAmount, lastPaymentDate});
   }else{
-    state.units.push({id: uid(), buildingId, unitNumber, tenantName, rentAmount, frequency, contractStart, contractEnd, waterAmount, insuranceAmount, lastPaymentDate, payments:[]});
+    state.units.push({id: uid(), buildingId, unitNumber, tenantName, rentAmount, frequency, contractStart, contractEnd, waterAmount, insuranceAmount, lastPaymentDate, payments:[], periodNotes:{}});
   }
   await saveData();
   closeModal('overlayUnit');
@@ -960,25 +977,44 @@ function openPaymentHistory(id){
     return;
   }
 
+  if(!u.periodNotes) u.periodNotes = {};
+
   let html = `<table class="histtable"><thead><tr>
-    <th>#</th><th>بداية الفترة</th><th>نهاية الفترة</th><th>الحالة</th>
+    <th>#</th><th>بداية الفترة</th><th>نهاية الفترة</th><th>الحالة</th><th>ملاحظات</th>
   </tr></thead><tbody>`;
 
-  // نعرض الأحدث أولاً
-  [...periods].reverse().forEach(p=>{
+  // الأقدم أولاً (رقم 1 في الأعلى) بحسب طلب المستخدم
+  periods.forEach(p=>{
     let cls='hist-unpaid', text='غير مدفوع';
     if(p.upcoming){ cls='hist-upcoming'; text='قادمة'; }
     else if(p.paid){ cls='hist-paid'; text='✓ مدفوع'; }
+    const key = p.start.toISOString().slice(0,10);
+    const noteVal = escapeHtml(u.periodNotes[key] || '');
     html += `<tr class="${cls}">
       <td>${p.index + 1}</td>
-      <td>${fmtDate(p.start.toISOString().slice(0,10))}</td>
-      <td>${fmtDate(p.end.toISOString().slice(0,10))}</td>
+      <td>${fmtDateNum(p.start.toISOString().slice(0,10))}</td>
+      <td>${fmtDateNum(p.end.toISOString().slice(0,10))}</td>
       <td class="hist-status">${text}</td>
+      <td class="hist-note"><input type="text" class="hist-note-input" placeholder="اكتب ملاحظة..." value="${noteVal}" onchange="savePeriodNote('${u.id}','${key}', this.value)"></td>
     </tr>`;
   });
   html += `</tbody></table>`;
   content.innerHTML = html;
   openModal('overlayHistory');
+}
+
+async function savePeriodNote(unitId, key, value){
+  const u = state.units.find(x=>x.id===unitId);
+  if(!u) return;
+  if(!u.periodNotes) u.periodNotes = {};
+  const trimmed = value.trim();
+  if(trimmed){
+    u.periodNotes[key] = trimmed;
+  }else{
+    delete u.periodNotes[key];
+  }
+  await saveData();
+  showToast('تم حفظ الملاحظة');
 }
 
 /* ---------- قائمة الخيارات المنسدلة (نسخة احتياطية / استعادة) ---------- */
