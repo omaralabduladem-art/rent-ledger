@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إيجارات</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAmUlEQVR4nO1XMRKAIAxrOScfou/wXcy+i3fAQ1h18yqC4p0Qh2Zr6V1CGgaYMhjnacv1v0D0gWV9KloSl4QYBLnkYwS5hHkeaQu+u72zXDp6hWUtGwx3AC5gqB2UNjrLF1vTXu364A7ABcBfgWYALkAzAF+BCtAQwlcAFwDPwL8d6AG4Ayb9q3UXgCQ/BKBciD6wkUVvciKiHac1VJiit+faAAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAADbElEQVR4nO3cy3XbVgBFUVAroxSS1JG6MnZdrkMqRNNkZC9/RBIAH/E52rsAgYOj62cR612mA/jz77/+2/szMMb769tlz+fv8nABfx5bB77Zw0TMFnE/9QEi5ppnxf2UHypk5hod9svIHzZNYmaZ0b0M++0QMo8asdZDFlrMjDCio4d+I4TMs6xd69ULLWaeaW1fq4IWM1tY09nioMXMlpb2tihoMbOHJd3NDlrM7Gluf7OCFjNHMKfDu0GLmSO51+Pwr75hTzeDts4c0a0urwYtZo7sWp+OHKR8GLR15gw+6vS3oMXMmfzaqyMHKT8FbZ05ox+7tdCkCJqU70E7bnBm3/q10KQImpTLNDlu0GGhSRE0KX/s/QGW+PrvrlcPf1r/fDnPifTF+ZkSRw5SBE2KoEkRNCmCJkXQpAiaFEGTImhSBE2KoEk51ctJazzyYs2Sl6EefYFnq2fVX/Cy0KQImhRBkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNyuVMNyfV3xQ7qlNdBbb3B4CRBE2KoEkRNCmCJkXQpAiaFEGTImhSBE2Ki2ZucNHM+VhoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgibFRTPc5aIZ2ImgSRE0KYImRdCkCJoUQZMiaFIETYqgSXHRzA0umjkfC02KoEkRNCmCJkXQpAiaFEGTImhSBE2KoEkRNCmCJkXQpLhohrtcNAM7ETQpgiZF0KQImhRBkyJoUgRNiqBJETQpLpq5wUUz52OhSRE0KYImRdCkCJoUQZMiaFIETYqgSRE0KYImRdCkuJeDu9zLATsRNCmCJkXQpAiaFEGTImhSBE2KoEkRNCmCJuVU73LAPRaaFEGT8vL++uadTDIsNCmCJkXQpLxM0zQ5R1Pw/vp2sdCkCJqU70E7dnBm3/q10KQImpSfgnbs4Ix+7NZCk/Jb0FaaM/m11w8XWtScwUedOnKQcjVoK82RXevz5kKLmiO61aUjByl3g7bSHMm9HmcttKg5gjkdzj5yiJo9ze1v0Rla1OxhSXeL/1Moara0tLdVf+UQNVtY09nqP9uJmmda29eQKN2PxyiPDuWQL1asNSOM6Gh4iNaapUYO4vCvvq01S4zu5anxWWuuedbwbbam4maLf713OR6I+/PY+gj6Pxo37bkgl+cBAAAAAElFTkSuQmCC">
+<meta name="apple-mobile-web-app-title" content="إيجارات">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A2726">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --ink: #0A2726;
+    --ink-2: #071F20;
+    --paper: #F7F5EF;
+    --paper-2: #FFFFFF;
+    --line: #A79E88;
+    --gold: #C9A227;
+    --gold-dark: #8A6E13;
+    --red: #971F1F;
+    --red-bg: #FBEAEA;
+    --amber: #9C5C0C;
+    --amber-bg: #FBF1DF;
+    --green: #235C3B;
+    --green-bg: #EAF3EC;
+    --muted: #423D33;
+    font-size: 16px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 10% 5%, rgba(201,162,39,0.08), transparent 35%),
+      radial-gradient(circle at 95% 95%, rgba(35,92,59,0.06), transparent 35%);
+    font-family: "Segoe UI", Tahoma, "Geeza Pro", Arial, sans-serif;
+    color: var(--ink);
+    min-height:100vh;
+    padding: 20px 14px 60px;
+  }
+  .wrap{max-width: 980px; margin: 0 auto;}
+
+  /* Header */
+  header{
+    display:flex; flex-direction:column; align-items:center;
+    gap:18px; margin-bottom: 24px;
+    padding: 24px 26px;
+    border-radius: 18px;
+    background: #0E3D30;
+    box-shadow: 0 10px 28px rgba(10,39,38,0.28);
+    position: relative;
+  }
+  .brand{display:flex; align-items:center; gap:16px; position:relative; z-index:1;}
+  .seal{
+    width:54px;height:54px;border-radius:15px;
+    background: #C9A227;
+    display:flex;align-items:center;justify-content:center;
+    box-shadow: 0 5px 14px rgba(0,0,0,0.25);
+    flex-shrink:0;
+  }
+  .seal svg{width:32px;height:32px;display:block;}
+  .title-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    height:54px;
+    background: #C9A227;
+    color: #000000;
+    padding: 0 26px;
+    border-radius: 12px;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    box-sizing:border-box;
+  }
+  .brand-group{display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; z-index:1; text-align:center;}
+  .brand-group p{color:#FFFFFF; margin:0 2px; font-size:13px; font-weight:500;}
+  .header-actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; position:relative; z-index:1; width:100%;}
+  header .btn-outline{background:#C9A227; border:1.5px solid #C9A227; color:#000000;}
+  header .btn-outline:hover{background:#B08F1F; border-color:#B08F1F;}
+  header .btn-gold{background:#C9A227; color:#000000;}
+  header .btn-gold:hover{background:#B08F1F;}
+  header .btn-ghost{color:#D9E4DF; border:1px solid rgba(255,255,255,0.28) !important;}
+  header .btn-ghost:hover{color:var(--gold); border-color:var(--gold) !important;}
+
+  .more-menu-wrap{position:relative;}
+  .btn-more{
+    background:#C9A227; border:1.5px solid #C9A227; color:#000000;
+    border-radius:8px; width:38px; height:38px; font-size:18px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .btn-more:hover{background:#B08F1F; border-color:#B08F1F;}
+  .more-dropdown{
+    display:none; position:absolute; top:calc(100% + 8px); left:0;
+    background:var(--paper-2); border:1px solid var(--line); border-radius:10px;
+    box-shadow: 0 10px 24px rgba(10,39,38,0.22); padding:6px; min-width:190px; z-index:60;
+  }
+  .more-dropdown.show{display:block;}
+  .more-dropdown button{
+    width:100%; text-align:right; background:transparent; border:none;
+    padding:10px 12px; font-size:13.5px; color:var(--ink); cursor:pointer;
+    border-radius:7px; font-family:inherit; font-weight:600;
+  }
+  .more-dropdown button:hover{background:var(--paper);}
+
+  .btn{
+    border:none; border-radius:8px; padding:10px 16px; font-size:14px;
+    cursor:pointer; font-family:inherit; font-weight:600; transition: transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{transform: scale(0.97);}
+  .btn-gold{background: var(--gold); color:#241B04;}
+  .btn-gold:hover{background: var(--gold-dark);}
+  .btn-outline{background:var(--paper-2); border:1.5px solid var(--ink); color:var(--ink);}
+  .btn-outline:hover{border-color: var(--gold-dark); color:var(--gold-dark);}
+  .btn-ghost{background:transparent; color:var(--muted); padding:6px 10px; font-weight:500;}
+  .btn-danger{background: var(--red-bg); color:var(--red);}
+  .btn-sm{padding:6px 10px; font-size:12.5px; border-radius:6px;}
+
+  /* Summary cards */
+  .summary{
+    display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; margin-bottom:22px;
+  }
+  @media (max-width:700px){ .summary{grid-template-columns: repeat(2,1fr);} }
+  .card{
+    background: var(--paper-2); border-radius:12px; padding:14px 16px;
+    border: 1px solid var(--line); position:relative; overflow:hidden;
+    box-shadow: 0 3px 10px rgba(10,39,38,0.06);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .card:hover{transform: translateY(-2px); box-shadow: 0 6px 16px rgba(10,39,38,0.1);}
+  .card::before{
+    content:""; position:absolute; inset-inline-start:0; top:0; bottom:0; width:4px;
+  }
+  .card.c-red::before{background:var(--red);}
+  .card.c-amber::before{background:var(--amber);}
+  .card.c-green::before{background:var(--green);}
+  .card.c-ink::before{background:var(--ink);}
+  .card .num{font-size:26px; font-weight:700; font-variant-numeric:tabular-nums;}
+  .card .lbl{font-size:12.5px; color:var(--muted); margin-top:2px;}
+
+  /* Filter bar */
+  .filterbar{
+    display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; align-items:center;
+  }
+  select, input[type=text], input[type=search], input[type=date]{
+    font-family:inherit; padding:10px 12px; border-radius:7px; border:1.5px solid var(--line);
+    background:#FBFAF6; color:var(--ink); font-size:14px; font-weight:500;
+  }
+  select:focus, input:focus{
+    outline:none; border-color:var(--gold-dark); box-shadow:0 0 0 3px rgba(201,162,39,0.22);
+  }
+  .filterbar select{min-width:160px;}
+  .filterbar input[type=search]{flex:1; min-width:160px;}
+
+  /* Summary table */
+  .sumtable-wrap{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:10px;
+    overflow-x:auto; margin-bottom:20px;
+  }
+  table.sumtable{width:100%; border-collapse:collapse; font-size:13.5px; min-width:680px;}
+  table.sumtable thead th{
+    text-align:right; padding:10px 12px; background:var(--ink); color:var(--paper);
+    font-weight:700; position:sticky; top:0; white-space:nowrap;
+  }
+  table.sumtable tbody td{
+    padding:9px 12px; border-bottom:1px solid var(--line); white-space:nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  table.sumtable tbody tr:last-child td{border-bottom:none;}
+  table.sumtable tbody tr.row-overdue{background:var(--red-bg);}
+  table.sumtable tbody tr.row-soon{background:var(--amber-bg);}
+  table.sumtable td.sc-status{font-weight:700;}
+  table.sumtable td.sc-status.overdue{color:var(--red);}
+  table.sumtable td.sc-status.soon{color:var(--amber);}
+  table.sumtable td.sc-status.ok{color:var(--green);}
+
+  /* Payment history table */
+  table.histtable{width:100%; border-collapse:collapse; font-size:13.5px;}
+  table.histtable thead th{
+    text-align:right; padding:8px 10px; background:var(--paper); color:var(--muted);
+    font-weight:700; border-bottom:2px solid var(--line); position:sticky; top:0;
+  }
+  table.histtable tbody td{padding:8px 10px; border-bottom:1px solid var(--line); text-align:right;}
+  table.histtable tbody tr.hist-paid{background:var(--green-bg);}
+  table.histtable tbody tr.hist-unpaid{background:var(--red-bg);}
+  table.histtable tbody tr.hist-upcoming{background:var(--paper);}
+  table.histtable td.hist-status{font-weight:700;}
+  table.histtable tr.hist-paid td.hist-status{color:var(--green);}
+  table.histtable tr.hist-unpaid td.hist-status{color:var(--red);}
+  table.histtable tr.hist-upcoming td.hist-status{color:var(--muted);}
+  table.histtable td.hist-note{padding:4px 6px;}
+  table.histtable input.hist-note-input{
+    width:100%; min-width:110px; padding:6px 8px; font-size:12.5px;
+    border:1.5px solid var(--line); border-radius:6px; background:#FBFAF6;
+  }
+  table.histtable input.hist-note-input:focus{
+    outline:none; border-color:var(--gold-dark); box-shadow:0 0 0 2px rgba(201,162,39,0.2);
+  }
+
+  /* Building groups */
+  .building-group{margin-bottom: 26px;}
+  .building-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 10px 4px; border-bottom: 2px solid rgba(201,162,39,0.5); margin-bottom:10px;
+  }
+  .building-head h2{color:var(--ink); font-size:17px; margin:0; display:flex; align-items:center; gap:8px;}
+  .building-head .count{color:var(--muted); font-size:13px; font-weight:400;}
+  .building-actions{display:flex; gap:6px;}
+
+  /* Unit ledger row */
+  .unit-card{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:12px;
+    padding:14px 16px; margin-bottom:10px;
+    display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center;
+    box-shadow: 0 2px 8px rgba(10,39,38,0.05);
+    transition: box-shadow .15s ease;
+  }
+  .unit-card:hover{box-shadow: 0 5px 14px rgba(10,39,38,0.09);}
+  .unit-main{display:flex; flex-direction:column; gap:4px;}
+  .unit-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .unit-name{font-weight:700; font-size:15.5px;}
+  .unit-tenant{color:var(--muted); font-size:13.5px;}
+  .badge{
+    display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:20px;
+    font-size:12px; font-weight:700;
+  }
+  .badge-dot{width:7px;height:7px;border-radius:50%;}
+  .badge-red{background:var(--red-bg); color:var(--red);}
+  .badge-red .badge-dot{background:var(--red); box-shadow:0 0 0 3px rgba(179,58,58,0.18);}
+  .badge-amber{background:var(--amber-bg); color:var(--amber);}
+  .badge-amber .badge-dot{background:var(--amber); box-shadow:0 0 0 3px rgba(199,122,31,0.18);}
+  .badge-green{background:var(--green-bg); color:var(--green);}
+  .badge-green .badge-dot{background:var(--green);}
+  .badge-gray{background:#EEEDE7; color:var(--muted);}
+
+  .unit-meta{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:12.5px; color:var(--muted);
+    font-variant-numeric: tabular-nums;
+    border-top: 1px dashed var(--line); padding-top:8px; margin-top:6px;
+  }
+  .unit-meta b{color:var(--ink); font-weight:600;}
+  .unit-actions{display:flex; flex-direction:column; gap:6px; align-items:stretch; min-width:120px;}
+
+  .empty{
+    text-align:center; color:var(--muted); padding: 50px 16px; font-size:14.5px;
+    background:var(--paper-2); border-radius:10px; border:1px solid var(--line);
+  }
+  .empty b{color:var(--gold-dark); display:block; font-size:17px; margin-bottom:6px;}
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(11,44,45,0.55); display:none;
+    align-items:center; justify-content:center; padding:16px; z-index:50;
+  }
+  .overlay.open{display:flex;}
+  .modal{
+    background:var(--paper-2); border-radius:12px; padding:22px; width:100%; max-width:480px;
+    max-height:88vh; overflow-y:auto; border-top:4px solid var(--gold);
+  }
+  .modal h3{margin:0 0 16px; font-size:17px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:13px; color:var(--muted); margin-bottom:5px; font-weight:600;}
+  .field input, .field select{width:100%;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .modal-actions{display:flex; gap:8px; margin-top:18px; justify-content:flex-end;}
+
+  .toast{
+    position:fixed; bottom:20px; right:50%; transform:translateX(50%);
+    background: var(--ink); color:var(--paper); padding:10px 20px; border-radius:8px;
+    font-size:13.5px; box-shadow:0 6px 20px rgba(0,0,0,0.3); z-index:60;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, bottom .25s ease;
+  }
+  .toast.show{opacity:1; bottom:30px;}
+
+  ::placeholder{color:#8C8674;}
+
+  .banner{
+    display:none; background:#FBF1DF; border:1.5px solid var(--amber); color:#5C3B08;
+    border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13.5px; line-height:1.8;
+  }
+  .banner.show{display:block;}
+  .banner code{background:#00000010; padding:1px 6px; border-radius:4px; font-size:12.5px;}
+  .sync-status{
+    display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); margin-bottom:14px;
+  }
+  .sync-dot{width:8px;height:8px;border-radius:50%; background:var(--green);}
+  .sync-dot.off{background:#9C9C9C;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand-group">
+      <div class="brand">
+        <div class="seal">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="3" width="14" height="19" rx="1.2" fill="#241B04"/>
+            <rect x="7.5" y="5.5" width="3" height="3" fill="#C9A227"/>
+            <rect x="13.5" y="5.5" width="3" height="3" fill="#C9A227"/>
+            <rect x="7.5" y="10.5" width="3" height="3" fill="#C9A227"/>
+            <rect x="13.5" y="10.5" width="3" height="3" fill="#C9A227"/>
+            <rect x="7.5" y="15.5" width="3" height="3" fill="#C9A227"/>
+            <rect x="13.5" y="15.5" width="3" height="3" fill="#C9A227"/>
+            <rect x="10.5" y="18" width="3" height="4" fill="#C9A227"/>
+          </svg>
+        </div>
+        <span class="title-badge">إيجارات</span>
+      </div>
+      <p>متابعة تحصيل الإيجارات وتواريخ العقود لكل المباني</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" id="btnAddBuilding">+ إضافة مبنى</button>
+      <button class="btn btn-gold" id="btnAddUnit">+ إضافة وحدة</button>
+      <div class="more-menu-wrap">
+        <button class="btn-more" id="btnMoreMenu" title="خيارات إضافية">⋯</button>
+        <div class="more-dropdown" id="moreDropdown">
+          <button id="btnBackup">⬇️ نسخة احتياطية</button>
+          <button id="btnRestore">⬆️ استعادة</button>
+        </div>
+      </div>
+      <input type="file" id="restoreFileInput" accept="application/json" style="display:none;">
+    </div>
+  </header>
+
+  <div class="banner" id="setupBanner">
+    ⚠️ لم يتم ربط قاعدة البيانات السحابية بعد — البيانات الآن تُحفظ في هذا المتصفح فقط ولن تظهر من جهاز آخر.
+    افتح ملف الكود وابحث عن <code>firebaseConfig</code> في الأسفل، واستبدله ببيانات مشروعك في Firebase، ثم ارفع الملف على GitHub Pages.
+  </div>
+  <div class="sync-status" id="syncStatus">
+    <span class="sync-dot off" id="syncDot"></span>
+    <span id="syncText">وضع الحفظ المحلي (بدون مزامنة)</span>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="filterbar">
+    <select id="filterBuilding"><option value="">كل المباني</option></select>
+    <input type="search" id="searchBox" placeholder="بحث باسم المستأجر أو رقم الوحدة...">
+    <select id="filterStatus">
+      <option value="">كل الحالات</option>
+      <option value="overdue">متأخر السداد</option>
+      <option value="soon">مستحق قريباً</option>
+      <option value="ok">غير مستحق</option>
+    </select>
+    <button class="btn btn-outline btn-sm" id="btnToggleView">📋 ملخص شامل</button>
+  </div>
+
+  <div id="content"></div>
+  <div id="summaryTableWrap" style="display:none;"></div>
+</div>
+
+<!-- Building Modal -->
+<div class="overlay" id="overlayBuilding">
+  <div class="modal">
+    <h3 id="buildingModalTitle">إضافة مبنى جديد</h3>
+    <input type="hidden" id="buildingId">
+    <div class="field">
+      <label>اسم المبنى</label>
+      <input type="text" id="buildingName" placeholder="مثال: عمارة النخيل">
+    </div>
+    <div class="field">
+      <label>الموقع (اختياري)</label>
+      <input type="text" id="buildingLocation" placeholder="مثال: حي الروضة">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('overlayBuilding')">إلغاء</button>
+      <button class="btn btn-gold" id="saveBuildingBtn">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Unit Modal -->
+<div class="overlay" id="overlayUnit">
+  <div class="modal">
+    <h3 id="unitModalTitle">إضافة وحدة / عقد إيجار</h3>
+    <input type="hidden" id="unitId">
+    <div class="field">
+      <label>المبنى</label>
+      <select id="unitBuilding"></select>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>رقم الوحدة</label>
+        <input type="text" id="unitNumber" placeholder="مثال: شقة 3">
+      </div>
+      <div class="field">
+        <label>اسم المستأجر</label>
+        <input type="text" id="unitTenant" placeholder="اسم المستأجر">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>قيمة الإيجار</label>
+        <input type="text" inputmode="decimal" id="unitRent" placeholder="0">
+      </div>
+      <div class="field">
+        <label>دورية السداد</label>
+        <select id="unitFreq">
+          <option value="1">شهري</option>
+          <option value="3">ربع سنوي</option>
+          <option value="6">نصف سنوي</option>
+          <option value="12">سنوي</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>تاريخ بداية العقد</label>
+        <input type="date" id="unitStart">
+      </div>
+      <div class="field">
+        <label>تاريخ نهاية العقد</label>
+        <input type="date" id="unitEnd">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>قيمة الماء</label>
+        <input type="text" inputmode="decimal" id="unitWater" placeholder="0">
+      </div>
+      <div class="field">
+        <label>التأمين</label>
+        <input type="text" inputmode="decimal" id="unitInsurance" placeholder="0">
+      </div>
+    </div>
+    <div class="field">
+      <label>تاريخ آخر تحصيل (اختياري)</label>
+      <input type="date" id="unitLastPaid">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('overlayUnit')">إلغاء</button>
+      <button class="btn btn-gold" id="saveUnitBtn">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment History Modal -->
+<div class="overlay" id="overlayHistory">
+  <div class="modal" style="max-width:620px;">
+    <h3 id="historyTitle">سجل الدفعات</h3>
+    <div id="historyContent" style="max-height:60vh; overflow-y:auto;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('overlayHistory')">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<button id="globalBackBtn" class="btn btn-outline btn-sm" onclick="goBack()" style="position:fixed; top:14px; right:14px; z-index:80; display:none; box-shadow:0 4px 12px rgba(10,39,38,0.18);">→ رجوع</button>
+<div class="toast" id="toast"></div>
+
+<script>
+let state = { buildings: [], units: [] };
+const STORAGE_KEY = 'rent-ledger-data'; // مفتاح الحفظ المحلي الاحتياطي
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ============================================================
+   إعداد Firebase — استبدل القيم أدناه بإعدادات مشروعك في Firebase
+   (Firebase Console → إعدادات المشروع → عام → تطبيقاتك → Web app)
+   طالما تركت القيم كما هي، سيعمل البرنامج بالحفظ المحلي فقط.
+   ============================================================ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCnyVLHZKbBvSYHpoTpTlshlWCgqfENwis",
+  authDomain: "rent-ledger-2928c.firebaseapp.com",
+  projectId: "rent-ledger-2928c",
+  storageBucket: "rent-ledger-2928c.firebasestorage.app",
+  messagingSenderId: "891180179928",
+  appId: "1:891180179928:web:fd10e23d227bec92ff92ad"
+};
+
+let db = null;
+let docRef = null;
+let firebaseReady = false;
+let suppressNextSave = false;
+
+function isConfigured(){
+  return firebaseConfig.apiKey && firebaseConfig.apiKey !== "YOUR_API_KEY";
+}
+
+function setSyncUI(connected){
+  const dot = document.getElementById('syncDot');
+  const text = document.getElementById('syncText');
+  if(connected){
+    dot.classList.remove('off');
+    text.textContent = 'متصل بقاعدة البيانات السحابية — البيانات تُشارك بين كل الأجهزة';
+  }else{
+    dot.classList.add('off');
+    text.textContent = 'وضع الحفظ المحلي (بدون مزامنة) — البيانات محفوظة في هذا المتصفح فقط';
+  }
+}
+
+function attachFirestoreListener(){
+  docRef.onSnapshot((snap)=>{
+    if(suppressNextSave){ suppressNextSave = false; return; }
+    if(snap.exists && snap.data().state){
+      try{ state = JSON.parse(snap.data().state); }catch(e){}
+    }
+    render();
+  }, (err)=>{
+    console.error(err);
+    showToast('تعذر الاتصال بقاعدة البيانات، تحقق من إعدادات Firebase وقواعد الأمان');
+    setSyncUI(false);
+  });
+}
+
+async function loadData(){
+  if(isConfigured()){
+    try{
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      docRef = db.collection('rentLedger').doc('data');
+      document.getElementById('setupBanner').classList.remove('show');
+      firebaseReady = true;
+      setSyncUI(true);
+      attachFirestoreListener();
+      return; // render() يُستدعى من onSnapshot
+    }catch(e){
+      console.error(e);
+      showToast('تعذر تهيئة Firebase، تحقق من الإعدادات');
+    }
+  }
+
+  // وضع احتياطي: الحفظ محلياً في المتصفح فقط
+  document.getElementById('setupBanner').classList.add('show');
+  setSyncUI(false);
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) state = JSON.parse(raw);
+  }catch(e){}
+  render();
+}
+
+async function saveData(){
+  if(firebaseReady && docRef){
+    try{
+      suppressNextSave = true;
+      await docRef.set({ state: JSON.stringify(state), updatedAt: Date.now() });
+    }catch(e){
+      console.error(e);
+      showToast('تعذر حفظ البيانات في قاعدة البيانات السحابية');
+    }
+    return;
+  }
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }catch(e){
+    showToast('تعذر حفظ البيانات في هذا المتصفح');
+  }
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2200);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); updateBackButtonVisibility(); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); updateBackButtonVisibility(); }
+
+/* زر الرجوع العام: يظهر في أي شاشة غير الشاشة الرئيسية (عرض البطاقات)،
+   سواء كانت نافذة مفتوحة أو عرض الملخص الشامل، ويرجع خطوة واحدة للخلف. */
+function updateBackButtonVisibility(){
+  const anyModalOpen = document.querySelectorAll('.overlay.open').length > 0;
+  const inTableView = viewMode === 'table';
+  const btn = document.getElementById('globalBackBtn');
+  if(btn) btn.style.display = (anyModalOpen || inTableView) ? 'inline-flex' : 'none';
+}
+
+function goBack(){
+  const openOverlay = document.querySelector('.overlay.open');
+  if(openOverlay){
+    openOverlay.classList.remove('open');
+    updateBackButtonVisibility();
+    return;
+  }
+  if(viewMode === 'table'){
+    document.getElementById('btnToggleView').click();
+    return;
+  }
+  updateBackButtonVisibility();
+}
+
+/* ---------- Date helpers ---------- */
+function addMonths(dateStr, months){
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+function todayDate(){
+  const d = new Date();
+  d.setHours(0,0,0,0);
+  return d;
+}
+function daysBetween(a, b){
+  return Math.round((b - a) / 86400000);
+}
+/* تنسيق تاريخ رقمي موحّد لكل البرنامج.
+   الخلايا في الجدول محاذاة لليمين (RTL)، والنص الرقمي يُكتب دائماً من
+   اليسار لليمين داخلياً؛ فآخر جزء نكتبه في النص هو اللي يظهر في أقصى
+   يمين الخلية. لذلك نكتب النص بترتيب سنة/شهر/يوم حتى يظهر اليوم
+   في أقصى اليمين، ثم الشهر، ثم السنة في أقصى اليسار — كما طلب المستخدم. */
+function fmtDate(dateStr){
+  if(!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  const day = String(d.getDate()).padStart(2,'0');
+  const month = String(d.getMonth()+1).padStart(2,'0');
+  const year = d.getFullYear();
+  return `${year}/${month}/${day}`;
+}
+/* تحويل كائن Date إلى نص YYYY-MM-DD بالتوقيت المحلي (بدون تحويل UTC)
+   لتفادي انزياح التاريخ يوماً كاملاً بسبب فارق التوقيت المحلي. */
+function toISODate(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function fmtNum(n){
+  return Number(n||0).toLocaleString('ar-EG');
+}
+
+function getDueInfo(unit){
+  const base = unit.lastPaymentDate || unit.contractStart;
+  if(!base) return {status:'ok', nextDue:null, days:null};
+  const next = addMonths(base, Number(unit.frequency));
+  const today = todayDate();
+  const days = daysBetween(today, next);
+  let status = 'ok';
+  if(days < 0) status = 'overdue';
+  else if(days <= 7) status = 'soon';
+  return {status, nextDue: next, days};
+}
+
+/* توليد فترات الدفع (من بداية العقد حسب الدورية) مع تحديد المدفوع منها */
+function generatePaymentPeriods(unit){
+  if(!unit.contractStart) return [];
+  const freq = Number(unit.frequency) || 1;
+  const today = todayDate();
+  const contractStartDate = new Date(unit.contractStart + 'T00:00:00');
+  const capDate = unit.contractEnd ? new Date(unit.contractEnd + 'T00:00:00') : null;
+  const lastPaid = unit.lastPaymentDate ? new Date(unit.lastPaymentDate + 'T00:00:00') : null;
+
+  /* كل الفترات تُبنى دائماً بدءاً من تاريخ بداية العقد وتتقدم بمقدار الدورية،
+     بحيث يبقى "يوم" بداية كل فترة مطابقاً دائماً ليوم بداية العقد في جدول (تعديل)،
+     بدلاً من الانزياح إلى يوم تاريخ آخر تحصيل. تاريخ آخر تحصيل يُستخدم فقط
+     لتحديد الفترات "المدفوعة"، وليس كنقطة انطلاق لحساب الفترات. */
+  const periods = [];
+  let idx = 0;
+  let cur = contractStartDate;
+  let guard = 0;
+
+  while(guard < 240){
+    if(capDate && cur > capDate) break;
+    const end = addMonths(toISODate(cur), freq);
+    const upcoming = cur > today;
+    const paid = !upcoming && (lastPaid ? cur <= lastPaid : false);
+    periods.push({index: idx++, start: new Date(cur), end, paid, upcoming});
+    if(upcoming) break; // نعرض فترة قادمة واحدة فقط ثم نتوقف
+    cur = end;
+    guard++;
+  }
+
+  return periods;
+}
+
+function getContractStatus(unit){
+  if(!unit.contractEnd) return null;
+  const end = new Date(unit.contractEnd + 'T00:00:00');
+  const today = todayDate();
+  const days = daysBetween(today, end);
+  if(days < 0) return {label:'العقد منتهي', cls:'badge-gray'};
+  if(days <= 30) return {label:'العقد ينتهي قريباً (' + days + ' يوم)', cls:'badge-amber'};
+  return null;
+}
+
+/* ---------- Rendering ---------- */
+function populateBuildingSelects(){
+  const filterSel = document.getElementById('filterBuilding');
+  const unitSel = document.getElementById('unitBuilding');
+  const prevFilter = filterSel.value;
+  filterSel.innerHTML = '<option value="">كل المباني</option>' +
+    state.buildings.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
+  filterSel.value = prevFilter;
+  unitSel.innerHTML = state.buildings.map(b=>`<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('');
+}
+
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+let viewMode = 'cards'; // 'cards' | 'table'
+
+function render(){
+  populateBuildingSelects();
+  renderSummary();
+  if(viewMode === 'table'){
+    renderSummaryTable();
+  }else{
+    renderContent();
+  }
+}
+
+function renderSummary(){
+  let overdue=0, soon=0, ok=0, monthlyTotal=0;
+  state.units.forEach(u=>{
+    const info = getDueInfo(u);
+    if(info.status==='overdue') overdue++;
+    else if(info.status==='soon') soon++;
+    else ok++;
+    // normalize to monthly-equivalent expected income
+    monthlyTotal += Number(u.rentAmount||0) / Number(u.frequency||1);
+  });
+  const el = document.getElementById('summary');
+  el.innerHTML = `
+    <div class="card c-red"><div class="num">${overdue}</div><div class="lbl">وحدات متأخرة السداد</div></div>
+    <div class="card c-amber"><div class="num">${soon}</div><div class="lbl">مستحقة خلال 7 أيام</div></div>
+    <div class="card c-green"><div class="num">${ok}</div><div class="lbl">وحدات مسددة</div></div>
+    <div class="card c-ink"><div class="num">${fmtNum(Math.round(monthlyTotal))}</div><div class="lbl">إجمالي الدخل الشهري المتوقع</div></div>
+  `;
+}
+
+function renderContent(){
+  const content = document.getElementById('content');
+  const fBuilding = document.getElementById('filterBuilding').value;
+  const fStatus = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchBox').value.trim().toLowerCase();
+
+  if(state.buildings.length === 0){
+    content.innerHTML = `<div class="empty"><b>لا توجد مبانٍ بعد</b>ابدأ بإضافة مبنى ثم أضف الوحدات وعقود الإيجار الخاصة به.</div>`;
+    return;
+  }
+
+  let buildingsToShow = state.buildings;
+  if(fBuilding) buildingsToShow = buildingsToShow.filter(b=>b.id===fBuilding);
+
+  let html = '';
+  let totalShown = 0;
+
+  buildingsToShow.forEach(b=>{
+    let units = state.units.filter(u=>u.buildingId===b.id);
+    units = units.filter(u=>{
+      const info = getDueInfo(u);
+      if(fStatus && info.status !== fStatus) return false;
+      if(search){
+        const hay = (u.tenantName+' '+u.unitNumber).toLowerCase();
+        if(!hay.includes(search)) return false;
+      }
+      return true;
+    });
+    if(fBuilding === '' && units.length===0 && (search || fStatus)) return;
+    totalShown += units.length;
+
+    html += `<div class="building-group">
+      <div class="building-head">
+        <h2>${escapeHtml(b.name)} <span class="count">(${units.length} وحدة)</span></h2>
+        <div class="building-actions">
+          <button class="btn btn-ghost btn-sm" onclick="editBuilding('${b.id}')">تعديل</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteBuilding('${b.id}')">حذف المبنى</button>
+        </div>
+      </div>`;
+
+    if(units.length===0){
+      html += `<div class="empty" style="padding:24px;">لا توجد وحدات مطابقة في هذا المبنى</div>`;
+    }else{
+      units.forEach(u=>{
+        const info = getDueInfo(u);
+        const contractInfo = getContractStatus(u);
+        let badgeCls='badge-green', badgeText='غير مستحق';
+        if(info.status==='overdue'){ badgeCls='badge-red'; badgeText='متأخر ' + Math.abs(info.days) + ' يوم'; }
+        else if(info.status==='soon'){ badgeCls='badge-amber'; badgeText = info.days===0 ? 'مستحق اليوم' : 'مستحق خلال ' + info.days + ' يوم'; }
+
+        html += `<div class="unit-card">
+          <div class="unit-main">
+            <div class="unit-top">
+              <span class="unit-name">${escapeHtml(u.unitNumber||'وحدة')}</span>
+              <span class="badge ${badgeCls}"><span class="badge-dot"></span>${badgeText}</span>
+              ${contractInfo ? `<span class="badge ${contractInfo.cls}">${contractInfo.label}</span>` : ''}
+            </div>
+            <div class="unit-tenant">${escapeHtml(u.tenantName||'بدون اسم مستأجر')}</div>
+            <div class="unit-meta">
+              <span>الإيجار: <b>${fmtNum(u.rentAmount)}</b></span>
+              <span>الدورية: <b>${freqLabel(u.frequency)}</b></span>
+              ${u.waterAmount ? `<span>الماء: <b>${fmtNum(u.waterAmount)}</b></span>` : ''}
+              ${u.insuranceAmount ? `<span>التأمين: <b>${fmtNum(u.insuranceAmount)}</b></span>` : ''}
+              <span>بداية العقد: <b>${fmtDate(u.contractStart)}</b></span>
+              <span>نهاية العقد: <b>${fmtDate(u.contractEnd)}</b></span>
+              <span>الاستحقاق القادم: <b>${info.nextDue ? fmtDate(toISODate(info.nextDue)) : '—'}</b></span>
+            </div>
+          </div>
+          <div class="unit-actions">
+            <button class="btn btn-gold btn-sm" onclick="markPaid('${u.id}')">تسجيل التحصيل</button>
+            ${(u.payments && u.payments.length>0) ? `<button class="btn btn-ghost btn-sm" onclick="undoLastPayment('${u.id}')">↩️ تراجع عن آخر تحصيل</button>` : ''}
+            <button class="btn btn-outline btn-sm" onclick="openPaymentHistory('${u.id}')">📅 سجل الدفعات</button>
+            <button class="btn btn-ghost btn-sm" onclick="editUnit('${u.id}')">تعديل</button>
+            <button class="btn btn-ghost btn-sm" style="color:var(--red)" onclick="deleteUnit('${u.id}')">حذف</button>
+          </div>
+        </div>`;
+      });
+    }
+    html += `</div>`;
+  });
+
+  if(html.trim()===''){
+    html = `<div class="empty"><b>لا نتائج</b>جرّب تعديل عوامل التصفية أو البحث.</div>`;
+  }
+  content.innerHTML = html;
+}
+
+function freqLabel(f){
+  return {1:'شهري',3:'ربع سنوي',6:'نصف سنوي',12:'سنوي'}[f] || f;
+}
+
+/* ---------- Building CRUD ---------- */
+document.getElementById('btnAddBuilding').onclick = ()=>{
+  document.getElementById('buildingModalTitle').textContent = 'إضافة مبنى جديد';
+  document.getElementById('buildingId').value = '';
+  document.getElementById('buildingName').value = '';
+  document.getElementById('buildingLocation').value = '';
+  openModal('overlayBuilding');
+};
+
+function editBuilding(id){
+  const b = state.buildings.find(x=>x.id===id);
+  if(!b) return;
+  document.getElementById('buildingModalTitle').textContent = 'تعديل المبنى';
+  document.getElementById('buildingId').value = b.id;
+  document.getElementById('buildingName').value = b.name;
+  document.getElementById('buildingLocation').value = b.location || '';
+  openModal('overlayBuilding');
+}
+
+document.getElementById('saveBuildingBtn').onclick = async ()=>{
+  const name = document.getElementById('buildingName').value.trim();
+  if(!name){ showToast('الرجاء إدخال اسم المبنى'); return; }
+  const id = document.getElementById('buildingId').value;
+  const location = document.getElementById('buildingLocation').value.trim();
+  if(id){
+    const b = state.buildings.find(x=>x.id===id);
+    b.name = name; b.location = location;
+  }else{
+    state.buildings.push({id: uid(), name, location});
+  }
+  await saveData();
+  closeModal('overlayBuilding');
+  render();
+  showToast('تم الحفظ');
+};
+
+async function deleteBuilding(id){
+  if(!confirm('سيتم حذف المبنى وجميع وحداته. هل أنت متأكد؟')) return;
+  state.buildings = state.buildings.filter(b=>b.id!==id);
+  state.units = state.units.filter(u=>u.buildingId!==id);
+  await saveData();
+  render();
+  showToast('تم الحذف');
+}
+
+/* ---------- Unit CRUD ---------- */
+document.getElementById('btnAddUnit').onclick = ()=>{
+  if(state.buildings.length===0){ showToast('أضف مبنى أولاً'); return; }
+  document.getElementById('unitModalTitle').textContent = 'إضافة وحدة / عقد إيجار';
+  document.getElementById('unitId').value='';
+  document.getElementById('unitNumber').value='';
+  document.getElementById('unitTenant').value='';
+  document.getElementById('unitRent').value='';
+  document.getElementById('unitFreq').value='1';
+  document.getElementById('unitStart').value='';
+  document.getElementById('unitEnd').value='';
+  document.getElementById('unitWater').value='';
+  document.getElementById('unitInsurance').value='';
+  document.getElementById('unitLastPaid').value='';
+  populateBuildingSelects();
+  openModal('overlayUnit');
+};
+
+function editUnit(id){
+  const u = state.units.find(x=>x.id===id);
+  if(!u) return;
+  document.getElementById('unitModalTitle').textContent = 'تعديل الوحدة';
+  document.getElementById('unitId').value = u.id;
+  populateBuildingSelects();
+  document.getElementById('unitBuilding').value = u.buildingId;
+  document.getElementById('unitNumber').value = u.unitNumber;
+  document.getElementById('unitTenant').value = u.tenantName;
+  document.getElementById('unitRent').value = u.rentAmount;
+  document.getElementById('unitFreq').value = u.frequency;
+  document.getElementById('unitStart').value = u.contractStart || '';
+  document.getElementById('unitEnd').value = u.contractEnd || '';
+  document.getElementById('unitWater').value = u.waterAmount || '';
+  document.getElementById('unitInsurance').value = u.insuranceAmount || '';
+  document.getElementById('unitLastPaid').value = u.lastPaymentDate || '';
+  openModal('overlayUnit');
+}
+
+document.getElementById('saveUnitBtn').onclick = async ()=>{
+  const buildingId = document.getElementById('unitBuilding').value;
+  const unitNumber = document.getElementById('unitNumber').value.trim();
+  const tenantName = document.getElementById('unitTenant').value.trim();
+  const rentAmount = parseFloat(document.getElementById('unitRent').value) || 0;
+  const frequency = document.getElementById('unitFreq').value;
+  const contractStart = document.getElementById('unitStart').value;
+  const contractEnd = document.getElementById('unitEnd').value;
+  const waterAmount = parseFloat(document.getElementById('unitWater').value) || 0;
+  const insuranceAmount = parseFloat(document.getElementById('unitInsurance').value) || 0;
+  const lastPaymentDate = document.getElementById('unitLastPaid').value;
+
+  if(!buildingId || !unitNumber || !contractStart){
+    showToast('الرجاء تعبئة المبنى ورقم الوحدة وتاريخ بداية العقد');
+    return;
+  }
+  const id = document.getElementById('unitId').value;
+  if(id){
+    const u = state.units.find(x=>x.id===id);
+    Object.assign(u, {buildingId, unitNumber, tenantName, rentAmount, frequency, contractStart, contractEnd, waterAmount, insuranceAmount, lastPaymentDate});
+  }else{
+    state.units.push({id: uid(), buildingId, unitNumber, tenantName, rentAmount, frequency, contractStart, contractEnd, waterAmount, insuranceAmount, lastPaymentDate, payments:[], periodNotes:{}});
+  }
+  await saveData();
+  closeModal('overlayUnit');
+  render();
+  showToast('تم الحفظ');
+};
+
+async function deleteUnit(id){
+  if(!confirm('هل تريد حذف هذه الوحدة؟')) return;
+  state.units = state.units.filter(u=>u.id!==id);
+  await saveData();
+  render();
+  showToast('تم الحذف');
+}
+
+async function markPaid(id){
+  const u = state.units.find(x=>x.id===id);
+  if(!u) return;
+  if(!confirm('هل أنت متأكد من تسجيل تحصيل دفعة جديدة لهذه الوحدة؟')) return;
+  const today = toISODate(new Date());
+  u.lastPaymentDate = today;
+  u.payments = u.payments || [];
+  u.payments.push({date: today, amount: u.rentAmount});
+  await saveData();
+  render();
+  showToast('تم تسجيل التحصيل');
+}
+
+async function undoLastPayment(id){
+  const u = state.units.find(x=>x.id===id);
+  if(!u || !u.payments || u.payments.length===0){
+    showToast('لا يوجد تحصيل مسجل للتراجع عنه');
+    return;
+  }
+  if(!confirm('هل أنت متأكد من التراجع عن آخر عملية تحصيل تم تسجيلها؟')) return;
+  u.payments.pop();
+  u.lastPaymentDate = u.payments.length>0 ? u.payments[u.payments.length-1].date : '';
+  await saveData();
+  render();
+  showToast('تم التراجع عن آخر تحصيل');
+}
+
+/* ---------- سجل الدفعات ---------- */
+function openPaymentHistory(id){
+  const u = state.units.find(x=>x.id===id);
+  if(!u) return;
+  const b = state.buildings.find(x=>x.id===u.buildingId);
+
+  document.getElementById('historyTitle').textContent =
+    `سجل الدفعات — ${u.unitNumber || 'وحدة'}${b ? ' / ' + b.name : ''}`;
+
+  const periods = generatePaymentPeriods(u);
+  const content = document.getElementById('historyContent');
+
+  if(!u.contractStart){
+    content.innerHTML = `<div class="empty" style="padding:24px;">أدخل تاريخ بداية العقد لعرض سجل الدفعات</div>`;
+    openModal('overlayHistory');
+    return;
+  }
+  if(periods.length === 0){
+    content.innerHTML = `<div class="empty" style="padding:24px;">لا توجد فترات دفع بعد</div>`;
+    openModal('overlayHistory');
+    return;
+  }
+
+  if(!u.periodNotes) u.periodNotes = {};
+
+  let html = `<table class="histtable"><thead><tr>
+    <th>#</th><th>بداية الفترة</th><th>نهاية الفترة</th><th>الحالة</th><th>ملاحظات</th>
+  </tr></thead><tbody>`;
+
+  // الأقدم أولاً (رقم 1 في الأعلى) بحسب طلب المستخدم
+  periods.forEach(p=>{
+    let cls='hist-unpaid', text='غير مدفوع';
+    if(p.upcoming){ cls='hist-upcoming'; text='قادمة'; }
+    else if(p.paid){ cls='hist-paid'; text='✓ مدفوع'; }
+    const key = toISODate(p.start);
+    const noteVal = escapeHtml(u.periodNotes[key] || '');
+    html += `<tr class="${cls}">
+      <td>${p.index + 1}</td>
+      <td>${fmtDate(toISODate(p.start))}</td>
+      <td>${fmtDate(toISODate(p.end))}</td>
+      <td class="hist-status">${text}</td>
+      <td class="hist-note"><input type="text" class="hist-note-input" placeholder="اكتب ملاحظة..." value="${noteVal}" onchange="savePeriodNote('${u.id}','${key}', this.value)"></td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  content.innerHTML = html;
+  openModal('overlayHistory');
+}
+
+async function savePeriodNote(unitId, key, value){
+  const u = state.units.find(x=>x.id===unitId);
+  if(!u) return;
+  if(!u.periodNotes) u.periodNotes = {};
+  const trimmed = value.trim();
+  if(trimmed){
+    u.periodNotes[key] = trimmed;
+  }else{
+    delete u.periodNotes[key];
+  }
+  await saveData();
+  showToast('تم حفظ الملاحظة');
+}
+
+/* ---------- قائمة الخيارات المنسدلة (نسخة احتياطية / استعادة) ---------- */
+document.getElementById('btnMoreMenu').onclick = (e)=>{
+  e.stopPropagation();
+  document.getElementById('moreDropdown').classList.toggle('show');
+};
+document.addEventListener('click', (e)=>{
+  const dropdown = document.getElementById('moreDropdown');
+  const wrap = document.querySelector('.more-menu-wrap');
+  if(dropdown.classList.contains('show') && !wrap.contains(e.target)){
+    dropdown.classList.remove('show');
+  }
+});
+
+/* ---------- النسخ الاحتياطي والاستعادة ---------- */
+function todayStamp(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+document.getElementById('btnBackup').onclick = ()=>{
+  document.getElementById('moreDropdown').classList.remove('show');
+  try{
+    const dataStr = JSON.stringify(state, null, 2);
+    const blob = new Blob([dataStr], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `نسخة-احتياطية-الايجارات-${todayStamp()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('تم تنزيل النسخة الاحتياطية');
+  }catch(e){
+    console.error(e);
+    showToast('تعذر إنشاء النسخة الاحتياطية');
+  }
+};
+
+document.getElementById('btnRestore').onclick = ()=>{
+  document.getElementById('moreDropdown').classList.remove('show');
+  document.getElementById('restoreFileInput').click();
+};
+
+document.getElementById('restoreFileInput').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  try{
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    if(!parsed || !Array.isArray(parsed.buildings) || !Array.isArray(parsed.units)){
+      showToast('ملف النسخة الاحتياطية غير صالح');
+      return;
+    }
+    if(!confirm('سيتم استبدال كل البيانات الحالية بمحتوى الملف. هل أنت متأكد؟')) return;
+    state = parsed;
+    await saveData();
+    render();
+    showToast('تم استعادة النسخة الاحتياطية بنجاح');
+  }catch(err){
+    console.error(err);
+    showToast('تعذر قراءة الملف، تأكد أنه ملف نسخة احتياطية صحيح');
+  }finally{
+    e.target.value = '';
+  }
+});
+
+/* ---------- Filters ---------- */
+function renderMain(){
+  if(viewMode === 'table') renderSummaryTable();
+  else renderContent();
+}
+
+document.getElementById('btnToggleView').onclick = ()=>{
+  viewMode = (viewMode === 'table') ? 'cards' : 'table';
+  document.getElementById('content').style.display = (viewMode==='table') ? 'none' : '';
+  document.getElementById('summaryTableWrap').style.display = (viewMode==='table') ? '' : 'none';
+  document.getElementById('btnToggleView').textContent = (viewMode==='table') ? '🗂️ عرض البطاقات' : '📋 ملخص شامل';
+  renderMain();
+  updateBackButtonVisibility();
+};
+
+function renderSummaryTable(){
+  const wrap = document.getElementById('summaryTableWrap');
+  const fBuilding = document.getElementById('filterBuilding').value;
+  const fStatus = document.getElementById('filterStatus').value;
+  const search = document.getElementById('searchBox').value.trim().toLowerCase();
+
+  if(state.units.length === 0){
+    wrap.innerHTML = `<div class="empty"><b>لا توجد وحدات بعد</b>أضف وحدات لتظهر هنا في الملخص الشامل.</div>`;
+    return;
+  }
+
+  const buildingName = (id)=> {
+    const b = state.buildings.find(x=>x.id===id);
+    return b ? b.name : '—';
+  };
+
+  let rows = state.units.map(u=>{
+    const info = getDueInfo(u);
+    const contractInfo = getContractStatus(u);
+    return {u, info, contractInfo};
+  });
+
+  rows = rows.filter(({u, info})=>{
+    if(fBuilding && u.buildingId !== fBuilding) return false;
+    if(fStatus && info.status !== fStatus) return false;
+    if(search){
+      const hay = (u.tenantName+' '+u.unitNumber+' '+buildingName(u.buildingId)).toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  // ترتيب: المتأخر أولاً، ثم المستحق قريباً، ثم الباقي — وداخل كل مجموعة الأقرب استحقاقاً أولاً
+  const statusOrder = {overdue:0, soon:1, ok:2};
+  rows.sort((a,b)=>{
+    const so = statusOrder[a.info.status] - statusOrder[b.info.status];
+    if(so !== 0) return so;
+    const da = a.info.nextDue ? a.info.nextDue.getTime() : Infinity;
+    const db = b.info.nextDue ? b.info.nextDue.getTime() : Infinity;
+    return da - db;
+  });
+
+  if(rows.length === 0){
+    wrap.innerHTML = `<div class="empty"><b>لا نتائج</b>جرّب تعديل عوامل التصفية أو البحث.</div>`;
+    return;
+  }
+
+  let html = `<div class="sumtable-wrap"><table class="sumtable">
+    <thead><tr>
+      <th>المبنى</th><th>الوحدة</th><th>المستأجر</th><th>الإيجار</th>
+      <th>الحالة</th><th>الاستحقاق القادم</th><th>نهاية العقد</th>
+    </tr></thead><tbody>`;
+
+  rows.forEach(({u, info, contractInfo})=>{
+    let rowCls='', statusCls='ok', statusText='غير مستحق';
+    if(info.status==='overdue'){ rowCls='row-overdue'; statusCls='overdue'; statusText='متأخر ' + Math.abs(info.days) + ' يوم'; }
+    else if(info.status==='soon'){ rowCls='row-soon'; statusCls='soon'; statusText = info.days===0 ? 'مستحق اليوم' : 'خلال ' + info.days + ' يوم'; }
+
+    html += `<tr class="${rowCls}">
+      <td>${escapeHtml(buildingName(u.buildingId))}</td>
+      <td><b>${escapeHtml(u.unitNumber||'—')}</b></td>
+      <td>${escapeHtml(u.tenantName||'—')}</td>
+      <td>${fmtNum(u.rentAmount)}</td>
+      <td class="sc-status ${statusCls}">${statusText}</td>
+      <td>${info.nextDue ? fmtDate(toISODate(info.nextDue)) : '—'}</td>
+      <td>${fmtDate(u.contractEnd)}${contractInfo ? ' ⚠️' : ''}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  wrap.innerHTML = html;
+}
+
+document.getElementById('filterBuilding').addEventListener('change', renderMain);
+document.getElementById('filterStatus').addEventListener('change', renderMain);
+document.getElementById('searchBox').addEventListener('input', renderMain);
+
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click', (e)=>{ if(e.target===ov) ov.classList.remove('open'); });
+});
+
+loadData();
+</script>
+</body>
+</html>
